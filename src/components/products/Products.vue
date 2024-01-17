@@ -2,31 +2,27 @@
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 import { ref, computed, onMounted } from 'vue'
-import CategoryTable from "./CategoryTable.vue"
+import ProductTable from "./ProductTable.vue"
 import { useToast } from "vue-toastification"
 
-import { useUserStore } from "/src/stores/user.js"
 import Button from 'primevue/button'
 
-const userStore = useUserStore()
-
 const router = useRouter()
-const categories = ref([])
+const products = ref([])
 const toast = useToast()
 
-const endpoint = userStore.userType === 'A' ? 'default_categories' : 'vcards/'+userStore.userId+'/categories';
-
-const loadCategories= async () => {
+const loadProducts= async () => {
     try{
-        const response = await axios.get(`${endpoint}`)
-        categories.value = response.data.data
+        const response = await axios.get('products')
+        products.value = response.data
+        console.log(response.data)
     }
     catch(error){
-        clearCategories()
+        clearProducts()
         throw error
     }
 }
-
+/*
 const deleteCategory = (category) => {
   try {
     if(userStore.userType == 'V')
@@ -44,31 +40,32 @@ const deleteCategory = (category) => {
       toast.error('Category was not deleted!')      
     }
 }
+*/
 
-const editCategory = (category) => {
-  router.push({ name: 'Category', params: { id: category.id } })
+const editProduct = (product) => {
+  router.push({ name: 'Product', params: { id: product.id } })
 }
 
-const addCategory = () => {
-  router.push({ name: 'NewCategory' })
+const addProduct = () => {
+  router.push({ name: 'NewProduct' })
 }
 
 onMounted(() => {
-  loadCategories()
+  loadProducts()
 })
-const showId = computed(() => userStore.userType === 'A')
+
 </script>
 
 <template>
-  <h3 class="mt-5 mb-3">Categories</h3>
+  <h3 class="mt-5 mb-3">Products</h3>
   <hr>
   <div class="mx-2 mt-2  mb-4 d-flex justify-content-between">
-    <Button type="button" class="border-round-xs"  @click="addCategory">
+    <Button type="button" class="border-round-xs"  @click="addProduct">
       <i class="bi bi-xs bi-plus-circle"></i>&nbsp;
-      Add Category
+      Add Product
     </Button>
   </div>
-  <category-table :categories="categories" :show-id="showId" @edit="editCategory" @delete="deleteCategory"></category-table>
+  <product-table :products="products" @edit="editProduct"></product-table>
 </template>
 
 <style scoped>

@@ -2,17 +2,12 @@
 import axios from 'axios'
 import { useToast } from "vue-toastification"
 import { ref, watch , computed} from 'vue'
-import CategoryDetail from "./CategoryDetail.vue"
+import ProductDetail from "./ProductDetail.vue"
 import { useRouter, onBeforeRouteLeave } from 'vue-router'
-import { useUserStore } from "/src/stores/user.js"
 
 
 const toast = useToast()
 const router = useRouter()
-
-const userStore = useUserStore()
-
-const endpoint = userStore.userType === 'A' ? 'default_categories' : 'categories';
 
 const props = defineProps({
     id: {
@@ -21,33 +16,34 @@ const props = defineProps({
     }
 })
 
-const newCategory = () => {
+const newProduct = () => {
     return {
       id: null,
-      type: '',
-      name: '',
+      catalogProductId: '',
+      manufacturerUsername: '',
+      orderId: '',
+      productPackages: '',
     }
 }
 
-const category = ref(newCategory())
+const product = ref(newProduct())
 
 const errors = ref(null)
 const confirmationLeaveDialog = ref(null)
 // String with the JSON representation after loading the project (new or edit)
 let originalValueStr = ''
 
-const loadCategory = async (id) => {
+const loadProduct = async (id) => {
   originalValueStr = ''
   errors.value = null
   if (!id || (id < 0)) {
-    category.value = newCategory()
-    originalValueStr = JSON.stringify(category.value)
+    product.value = newProduct()
+    originalValueStr = JSON.stringify(product.value)
   } else {
       try {
-        console.log(`${endpoint}/${id}`)
-        const response = await axios.get(`${endpoint}/${id}`)
-        category.value = response.data.data
-        originalValueStr = JSON.stringify(category.value)
+        const response = await axios.get('products/' + id)
+        product.value = response.data.data
+        originalValueStr = JSON.stringify(product.value)
       } catch (error) {
         console.log(error)
       }
@@ -58,33 +54,36 @@ const operation = computed( () => (!props.id || props.id < 0) ? 'insert' : 'upda
 
 
 const save =  () => {
-  if (operation.value == 'insert') 
-  {
-    axios.post(`${endpoint}`, category.value)
+  if (!product.value) {
+    toast.error("Product is not defined");
+    return;
+  }
+
+  if (operation.value == 'insert') {
+    axios.post('products', product.value)
       .then((response) => {
-        toast.success('Category Created')
+        toast.success('Product Created')
         console.dir(response.data.data)
-        originalValueStr = JSON.stringify(category.value)
-        router.push({name:'Categories'})
+        originalValueStr = JSON.stringify(product.value)
+        router.push({name:'Products'})
       })
       .catch((error) => {
-        if (error.response.status == 422) {
+        if (error.response && error.response.status == 422) {
           errors.value = error.response.data.errors
           toast.error("Validation Error")
-      }
+        }
       })
   } else {
-    axios.put(`${endpoint}/${category.value.id}`, category.value)
+    axios.put('products/' + id, product.value)
       .then((response) => {
-        toast.success('Category Updated')
+        toast.success('Product Updated')
         console.dir(response.data.data)
-        originalValueStr = JSON.stringify(category.value)
-        router.push({name:'Categories'})
       })
       .catch((error) => {
-        errors.value = error.response.data.errors
-        toast.error("Validation Error")
-        console.dir(error)
+        if (error.response && error.response.status == 422) {
+          errors.value = error.response.data.errors
+          toast.error("Validation Error")
+        }
       })
   }
 }
@@ -96,7 +95,7 @@ const cancel =  () => {
 watch(
   () => props.id,
   (newValue) => {
-      loadCategory(newValue)
+      loadProduct(newValue)
     },
   {immediate: true}  
 )
@@ -110,7 +109,7 @@ const leaveConfirmed = () => {
 
 onBeforeRouteLeave((to, from, next) => {
   nextCallBack = null
-  let newValueStr = JSON.stringify(category.value)
+  let newValueStr = JSON.stringify(product.value)
   if (originalValueStr != newValueStr) {
     // Some value has changed - only leave after confirmation
     nextCallBack = next
@@ -132,12 +131,11 @@ onBeforeRouteLeave((to, from, next) => {
   >
   </confirmation-dialog>  
 
-  <category-detail
+  <product-detail
     :operationType="operation"
-    :category="category"
+    :product="product"
     :errors="errors"
     @save="save"
     @cancel="cancel"
-    @deleteCategory = "deleteCategory"
-  ></category-detail>
+  ></product-detail>
 </template>

@@ -19,9 +19,9 @@ const newUser = () => {
     return {
       id: null,
       name: '',
+      username: '',
       email: '',
-      gender: 'M',
-      photo_url: null
+      password: ''
     }
 }
 

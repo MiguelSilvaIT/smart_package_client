@@ -1,11 +1,9 @@
 <script setup>
-  import WebSocketTester from '/src/components/WebSocketTester.vue';
 </script>
 
 <template>
   <div class="container">
     <h1> DAE 2023/24</h1>
-    <WebSocketTester />
   </div>
 </template>
 

@@ -2,11 +2,9 @@
 import axios from 'axios'
 import { useToast } from "vue-toastification"
 import { ref, watch , computed, inject} from 'vue'
-import TransactionDetail from "./TransactionDetail.vue"
+import TransportPackageDetail from "./TransportPackageDetail.vue"
 import { useRouter, onBeforeRouteLeave } from 'vue-router'
-import { useUserStore } from '../../stores/user'
 
-const userStore = useUserStore()
 const toast = useToast()
 const router = useRouter()
 const socket = inject('socket')
@@ -18,46 +16,35 @@ const props = defineProps({
     }
 })
 
-const NewTransaction = () => {
+const NewTransportPackage = () => {
     return {
         id: null,
-        vcard:userStore.userId.toString(),
-        payment_type: 'VCARD',
-        payment_ref: '', 
-        type:'D',
-        description: '',
-        category_id: null,
-        value: null
+        material: '', 
+        orders: [],
+        sensors: [],
+        type: '',
     }
 }
 
-const NewExternalTransaction = () => {
-    return {
-        type: 'VCARD',
-        reference: '', 
-        value: null
-    }
-}
 
-const transaction = ref(NewTransaction())
-const externalTransaction = ref(NewExternalTransaction())
+const transportPackage = ref(NewTransportPackage())
 
 const errors = ref(null)
 const confirmationLeaveDialog = ref(null)
 // String with the JSON representation after loading the project (new or edit)
 let originalValueStr = ''
 
-const loadTransactions = async (id) => {
+const loadTransportPackages = async (id) => {
   originalValueStr = ''
   errors.value = null
   if (!id || (id < 0)) {
-    transaction.value = NewTransaction()
-    originalValueStr = JSON.stringify(transaction.value)
+    transportPackage.value = NewTransportPackage()
+    originalValueStr = JSON.stringify(transportPackage.value)
   } else {
       try {
-        const response = await axios.get('transactions/' + id)
-        transaction.value = response.data.data
-        originalValueStr = JSON.stringify(transaction.value)
+        const response = await axios.get('transport_packages/' + id)
+        transportPackage.value = response.data.data
+        originalValueStr = JSON.stringify(transportPackage.value)
       } catch (error) {
         console.log(error)
       }
@@ -69,19 +56,14 @@ const operation = computed( () => (!props.id || props.id < 0) ? 'insert' : 'upda
 const save =  async () => {
   if (operation.value == 'insert') 
   {
-    
-    if(transaction.value.payment_type == 'VCARD'){
-      transaction.value.pair_vcard = transaction.value.payment_ref
-    }
     try{
-      const response = await axios.post('transactions', transaction.value)
+      const response = await axios.post('transport_packages', transportPackage.value)
       console.dir(response.data)
       if(response.data.success){
-        toast.success('Transaction Created')
-        socket.emit('newTransaction', response.data.data)
+        toast.success('Transport Package Created')
         console.dir(response.data)
-        originalValueStr=JSON.stringify(transaction.value)
-        router.push({name: 'Transactions'})
+        originalValueStr=JSON.stringify(transportPackage.value)
+        router.push({name: 'TransportPackages'})
       }
       else{
         toast.error(response.data.message)
@@ -92,12 +74,12 @@ const save =  async () => {
       toast.error("Validation Error")
     }
   } else {
-    axios.put('transactions/' + props.id, transaction.value)
+    axios.put('transport_packages/' + props.id, transportPackage.value)
       .then((response) => {
-        toast.success('Transaction Updated')
+        toast.success('Transport Package Updated')
         console.dir(response.data)
         originalValueStr=JSON.stringify(transaction.value)
-        router.push({name: 'Transactions'})
+        router.push({name: 'TransportPackages'})
       })
       .catch((error) => {
       if (error.response && error.response.status == 422) {
@@ -116,7 +98,7 @@ const cancel =  () => {
 watch(
   () => props.id,
   (newValue) => {
-      loadTransactions(newValue)
+    loadTransportPackages(newValue)
     },
   {immediate: true}  
 )
@@ -132,7 +114,7 @@ const leaveConfirmed = () => {
 
 onBeforeRouteLeave((to, from, next) => {
   nextCallBack = null
-  let newValueStr = JSON.stringify(transaction.value)
+  let newValueStr = JSON.stringify(transportPackage.value)
   if (originalValueStr != newValueStr) {
     // Some value has changed - only leave after confirmation
     nextCallBack = next
@@ -157,11 +139,11 @@ onBeforeRouteLeave((to, from, next) => {
   >
   </confirmation-dialog>  
   
-  <transaction-detail
+  <transportPackage-detail
     :operationType="operation"
-    :transaction="transaction"
+    :transportPackage="transportPackage"
     :errors="errors"
     @save="save"
     @cancel="cancel"
-  ></transaction-detail>
+  ></transportPackage-detail>
 </template>

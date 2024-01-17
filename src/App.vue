@@ -1,35 +1,24 @@
 <script setup>
 import { useRouter,RouterLink, RouterView } from 'vue-router'
 import { ref, onMounted } from 'vue'
-
+import { useUserStore } from './stores/user'
 import axios from 'axios'
 import { useToast } from "vue-toastification"
 
-
+const userStore = useUserStore()
 const router = useRouter()
 
 const toast = useToast()
 
-
-/*
 const logout = async () => {
   if (await userStore.logout()) {
     toast.success('User has logged out of the application.')
-    clickMenuOption()
     router.push({name: 'home'})
   } else {
     toast.error('There was a problem logging out of the application!')
   }
-}*/
-
-const clickMenuOption = () => {
-  const domReference = document.getElementById('buttonSidebarExpandId')
-  if (domReference) {
-    if (window.getComputedStyle(domReference).display !== "none") {
-      domReference.click()
-    }
-  }
 }
+
 </script>
 
 
@@ -44,50 +33,21 @@ const clickMenuOption = () => {
       <div class="collapse navbar-collapse justify-content-end">
         <ul class="navbar-nav">
           <li class="nav-item">
-            <router-link class="nav-link" :class="{ active: $route.name === 'NewVcard'}" :to="{ name: 'NewVcard' }" @click="clickMenuOption">
               <i class="bi bi-person-check-fill"></i>
               Register
-            </router-link >
           </li>
+          <router-link to="/auth/login" class="nav-link">
           <li class="nav-item">
-            <router-link class="nav-link" :class="{ active: $route.name === 'Login' }" 
-                        :to="{ name: 'Login' }" @click="clickMenuOption">
               <i class="bi bi-box-arrow-in-right"></i>
               Login
-            </router-link>
           </li>
-          <li class="nav-item dropdown" >
+          </router-link>
+          <li class="nav-item dropdown" v-show="userStore.user">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
               data-bs-toggle="dropdown" aria-expanded="false">
-              <img class="rounded-circle z-depth-0 avatar-img" alt="avatar image">
-              <span class="avatar-text"> XXX </span>
-            </a>  
-            <!-- only show dropdown when userStore.userId != null -->
-            
+              <span class="avatar-text">{{ userStore.userName }}</span>
+            </a>
             <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
-              <li >
-                <router-link class="dropdown-item"></router-link>
-                  <i class="bi bi-person-square"></i>
-                  Profile
-              </li>
-              <li >
-                <router-link class="dropdown-item"></router-link>
-                            <i class="bi bi-person-square"></i>
-                  Profile
-              </li>
-              <li>
-                <router-link></router-link>
-                  <i class="bi bi-key-fill"></i>
-                  Change Password
-              </li>
-              <li >
-                <router-link ></router-link>
-                <i class="bi bi-123"></i>
-                  Change Confirmation Code
-              </li>
-              <li>
-                <hr class="dropdown-divider">
-              </li>
               <li>
                 <a class="dropdown-item" @click.prevent="logout">
                   <i class="bi bi-arrow-right"></i>Logout
@@ -100,55 +60,45 @@ const clickMenuOption = () => {
     </div>
   </nav>
 
-  <div class="container-fluid">
+  <div  class="container-fluid">
     <div class="row">
-      <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
-        <div class="position-sticky pt-3">
+      <nav v-if="userStore.user"  id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+        <div v-show="userStore.user" class="position-sticky pt-3">
           <ul class="nav flex-column" >
             <li class="nav-item" >
-              <router-link class="nav-link" :class="{ active: $route.name === 'Dashboard' }" 
-                          :to="{ name: 'Dashboard' }" @click="clickMenuOption"> 
+              <router-link to="/" class="nav-link">
                 <i class="bi bi-house"></i>
-                Dashboard
+                Home
               </router-link>
             </li>
             <li class="nav-item" >
-                <router-link ></router-link>
-                  <i class="bi bi-files"></i>
-                    Categories
+                <i class="bi bi-files"></i>
+                  Sensors
             </li>
 
-           
+           <router-link to="/orders" class="nav-link">
             <li class="nav-item" >
-                <router-link ></router-link>
                   <i class="bi bi-files"></i>
-                    Vcards
+                    Orders
             </li>
-
+            </router-link>
+            <router-link to="/products" class="nav-link">
+            <li class="nav-item" >
+                  <i class="bi bi-files"></i>
+                    Products
+            </li>
+            </router-link>
             <li class="nav-item"  >
-                <router-link ></router-link>
                   <i class="bi bi-files"></i>
-                    Administrators
+                    Packages
             </li>
+            <router-link to="/transportPackages" class="nav-link">
             <li  class="nav-item">
-                <router-link ></router-link>
                   <i class="bi bi-files"></i>
-                    Transactions
+                    Transport Packages   
             </li>
-            <li class="nav-item">
-                <router-link ></router-link>
-                  <i class="bi bi-files"></i>
-                    Transactions
-               
-            </li>
+            </router-link>
             <li class="nav-item" >
-              <router-link ></router-link>
-                <i class="bi bi-bar-chart-line"></i>
-                Reports
-            </li>
-            
-            <li class="nav-item" >
-              <router-link ></router-link>
                 <i class="bi bi-bar-chart-line"></i>
                 Reports
             </li>

@@ -1,167 +1,72 @@
 <script setup>
 import { ref, watch, computed, inject } from "vue";
-import { useUserStore } from "/src/stores/user.js"
 import Dialog from 'primevue/dialog'
-import avatarNoneUrl from '@/assets/avatar-none.png'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import axios from "axios";
 import { useToast } from "vue-toastification";
 
-const userStore = useUserStore()
 
 const serverBaseUrl = inject("serverBaseUrl");
 
 
 const props = defineProps({
-  vcard: {
+  order: {
     type: Object,
     required: true,
   },
-  inserting: {
-    type: Boolean,
-    default: false,
-  },
+
   errors: {
     type: Object,
     required: false,
   },
 });
 
-const emit = defineEmits(["save", "cancel", "deleteVcard"]);
+const emit = defineEmits(["save", "cancel"]);
 
-const editingVcard = ref(props.vcard)
+const editingOrder = ref(props.order)
 const inputPhotoFile = ref(null)
 const editingImageAsBase64 = ref(null)
 const deletePhotoOnTheServer = ref(false)
 const toast = useToast()
-const confirmationCode = ref('')
 const password = ref('')
 
 const showDialog = ref(false)
 
 watch(
-  () => props.vcard,
-  (newVcard) => {
-    editingVcard.value = newVcard
+  () => props.order,
+  (newOrder) => {
+    editingOrder.value = newOrder
   },
   { immediate: true },
   
 )
 
 
-const photoFullUrl = computed(() => {
-  if (deletePhotoOnTheServer.value) {
-    return avatarNoneUrl
-  }
-  if (editingImageAsBase64.value) {
-    return editingImageAsBase64.value
-  } else {
-    return editingVcard.value.photo_url
-      ? serverBaseUrl + "/storage/fotos/" + editingVcard.value.photo_url
-      : avatarNoneUrl
-  }
-})
-
-const userTitle = computed(()=>{
-  if (!editingVcard.value) {
-    return ''
-  }
-  return props.inserting ? 'Criar um novo vCard' : 'vCard ' + editingVcard.value.phone_number 
-})
-
 const save = () => {
-  const userToSave = editingVcard.value
-  userToSave.deletePhotoOnServer = deletePhotoOnTheServer.value
-  userToSave.base64ImagePhoto = editingImageAsBase64.value
-  emit("save", userToSave);
+  const orderToSave = editingOrder.value
+  emit("save", orderToSave);
 }
 
 const cancel = () => {
-  emit("cancel", editingVcard.value);
+  emit("cancel", editingOrder.value);
 }
-
-const deleteVcard = () => {
-  emit("deleteVcard", editingVcard.value);
-}
-
-const changePhotoFile = () => {
-  try {
-    const file = inputPhotoFile.value.files[0]
-    if (!file) {
-      editingImageAsBase64.value = null
-    } else {
-      const reader = new FileReader()
-      reader.addEventListener(
-          'load',
-          () => {
-            // convert image file to base64 string
-            editingImageAsBase64.value = reader.result
-            deletePhotoOnTheServer.value = false
-          },
-          false,
-      )
-      if (file) {
-        reader.readAsDataURL(file)
-      }
-    }
-  } catch (error) {
-    editingImageAsBase64.value = null
-  }
-}
-
-const resetToOriginalPhoto = () => {
-  deletePhotoOnTheServer.value = false
-  inputPhotoFile.value.value = ''
-  changePhotoFile()
-}
-
-const cleanPhoto = () => {
-  deletePhotoOnTheServer.value = true
-}
-
-const confirmDeletion = async () => {
-  try {
-    const response = await axios.post(`vcards/${editingVcard.value.phone_number}/confirmdelete`, {
-      password: password.value,
-      confirmation_code: confirmationCode.value
-    })
-    deleteVcard()
-    showDialog.value = false
-  } catch (error) {
-    toast.error(error.response.data.message)
-  }
-}
-
 </script>
 
 <template>
   <form class="row g-3 needs-validation" novalidate @submit.prevent="save">
-    <h3 class="mt-5 mb-3">{{ userTitle }}</h3>
+    <h3 class="mt-5 mb-3">{{ order.id }}</h3>
     <hr />
     <div class="d-flex flex-wrap justify-content-between">
       <div class="w-75 pe-4">
         <div class="mb-5">
           <span class="p-float-label">
-            <InputText type="text" v-model="editingVcard.name" 
+            <InputText type="text" v-model="editingOrder.name" 
                     :class="{ 'is-invalid': errors ? errors['name'] : false }"/>
             <label for="number-input">Name</label>
             <field-error-message :errors="errors" fieldName="name"></field-error-message>
           </span>
         </div>
-        <!-- <div class="mb-3">
-          <label for="inputName" class="form-label">Nome</label>
-          <input
-            type="text"
-            class="form-control"
-            
-            id="inputName"
-            placeholder="Nome"
-            required
-            v-model="editingVcard.name"
-          />
-          
-        </div> -->
         <div class="mb-5">
           <span class="p-float-label">
             <InputText type="text" v-model="editingVcard.email" 

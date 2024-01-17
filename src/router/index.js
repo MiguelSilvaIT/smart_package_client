@@ -1,5 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import Order from '../components/orders/Order.vue'
+import Orders from '../components/orders/Orders.vue'
+import Product from '../components/products/Product.vue'
+import Products from '../components/products/Products.vue'
+import Login from '../components/auth/Login.vue'
+import TransportPackage from '../components/transportPackages/TransportPackage.vue'
+import TransportPackages from '../components/transportPackages/TransportPackages.vue'
+import { useUserStore } from '../stores/user.js'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -17,6 +25,56 @@ const router = createRouter({
       // which is lazy-loaded when the route is visited.
       component: () => import('../views/AboutView.vue')
     },
+    {
+      path: '/orders',
+      name: 'orders',
+      component: Orders
+    },
+    {
+      path: '/orders/:id',
+      name: 'order',
+      component: Order,
+      props: route => ({ id: parseInt(route.params.id) })
+    },
+    {
+      path: '/products',
+      name: 'products',
+      component: Products
+    },
+    {
+      path: '/products/:id',
+      name: 'Product',
+      component: Product,
+      props: route => ({ id: parseInt(route.params.id) })
+    },
+    {
+      path: '/products',
+      name: 'NewProduct',
+      component: Product,
+      props: { id: -1 }
+    },
+    {
+      path: '/auth/login',
+      name: 'Login',
+      component: Login
+    },
+    {
+      path: '/transportPackages',
+      name: 'transportPackages',
+      component: TransportPackages
+    },
+    {
+      path: '/transportPackages/:id',
+      name: 'TransportPackage',
+      component: TransportPackage,
+      props: route => ({ id: parseInt(route.params.id) })
+    },
+    {
+      path: '/transportPackages',
+      name: 'NewTransportPackage',
+      component: TransportPackage,
+      props: { id: -1 }
+    },
     /*{
       path: '/reports',
       name: 'Reports',
@@ -27,11 +85,7 @@ const router = createRouter({
       name: 'AdminReports',
       component: AdminReports
     },
-    {
-      path: '/auth/login',
-      name: 'Login',
-      component: Login
-    },
+    
     {
       path: '/password',
       name: 'ChangePassword',
@@ -73,8 +127,10 @@ const router = createRouter({
 let handlingFirstRoute = true
 
 router.beforeEach( async (to, from, next) => {
+  const userStore = useUserStore()
   if (handlingFirstRoute) {
-    handlingFirstRoute = false
+      handlingFirstRoute = false
+      await userStore.restoreToken()
     }
   if ((to.name == 'Login') || (to.name == 'home')) {
     next()

@@ -88,7 +88,13 @@ const logout = async () => {
                       Products
               </li>
             </router-link>
-            <router-link to="/catalogProducts" class="nav-link">
+            <router-link to="/catalogProducts" class="nav-link" v-if="userStore.userType == 'Client'">
+            <li class="nav-item" >
+                  <i class="bi bi-files"></i>
+                  Catalog Products
+            </li>
+            </router-link>
+            <router-link to="/manageCatalogProducts" class="nav-link" v-if="userStore.userType == 'Manufacturer'">
             <li class="nav-item" >
                   <i class="bi bi-files"></i>
                   Catalog Products

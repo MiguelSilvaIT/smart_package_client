@@ -8,6 +8,7 @@ import Login from '../components/auth/Login.vue'
 import TransportPackage from '../components/transportPackages/TransportPackage.vue'
 import TransportPackages from '../components/transportPackages/TransportPackages.vue'
 import CatalogProducts from '../components/catalogProducts/CatalogProducts.vue'
+import ManageCatalogProducts from '../components/catalogProducts/ManageCatalogProducts.vue'
 import { useUserStore } from '../stores/user.js'
 
 const router = createRouter({
@@ -52,6 +53,11 @@ const router = createRouter({
       path:'/catalogProducts',
       name: 'catalogProducts',
       component: CatalogProducts,
+    },
+    {
+      path:'/manageCatalogProducts',
+      name: 'catalogProducts',
+      component: ManageCatalogProducts,
     },
     {
       path: '/products',

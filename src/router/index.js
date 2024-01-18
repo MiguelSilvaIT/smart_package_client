@@ -33,7 +33,7 @@ const router = createRouter({
     },
     {
       path: '/orders/:id',
-      name: 'order',
+      name: 'Order',
       component: Order,
       props: route => ({ id: parseInt(route.params.id) })
     },

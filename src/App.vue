@@ -83,9 +83,15 @@ const logout = async () => {
             </li>
             </router-link>
             <router-link to="/products" class="nav-link">
+              <li class="nav-item" >
+                    <i class="bi bi-files"></i>
+                      Products
+              </li>
+            </router-link>
+            <router-link to="/catalogProducts" class="nav-link">
             <li class="nav-item" >
                   <i class="bi bi-files"></i>
-                    Products
+                  Catalog Products
             </li>
             </router-link>
             <li class="nav-item"  >

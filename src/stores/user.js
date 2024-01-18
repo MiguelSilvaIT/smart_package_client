@@ -9,6 +9,7 @@ export const useUserStore = defineStore('user', () => {
     const toast = useToast()
     const router = useRouter()
     const user = ref(null)
+    const userUsername = computed(() => user.value?.username ?? 'Anonymous')
     const userName = computed(() => user.value?.name ?? 'Anonymous')
     const userType = computed(() => user.value?.role ?? "None")
 
@@ -69,5 +70,5 @@ export const useUserStore = defineStore('user', () => {
         return false
     }
 
-    return { user, userName, userType, loadUser, clearUser, login, logout, restoreToken}
+    return { user, userUsername, userName, userType, loadUser, clearUser, login, logout, restoreToken}
 })

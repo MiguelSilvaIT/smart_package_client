@@ -6,7 +6,7 @@ import { FilterMatchMode } from 'primevue/api';
 import { useToast } from 'primevue/usetoast';
 
 import InputText from 'primevue/inputtext';
-import 'primeicons/primeicons.css'
+import 'primeicons/primeicons.css';    
 const props = defineProps({
   products: {
     type: Array,
@@ -62,9 +62,9 @@ const editClick = (product) => {
 
 <template>
   <DataTable v-model:expandedRows="selectedProduct" @rowSelect="onRowExpand" @rowUnselect="onRowCollapse"
-     v-model:selection="selectedProduct" :value="products" 
-     selectionMode="multiple" dataKey="id"
-     :metaKeySelection=false paginator sortField="id" :sortOrder="1" :rows="30" stripedRows >
+     v-model:selection="selectedProduct" :value="products"
+     selectionMode="multiple" dataKey="id" 
+     :metaKeySelection=false paginator sortField="id" :sortOrder="1" :rows="30" >
      <template #header>
           <div class="flex justify-content-end">
               <span class="p-input-icon-left">
@@ -73,8 +73,7 @@ const editClick = (product) => {
               </span>
           </div>
       </template>
-     <template #empty> No products found. </template>
-      <template #loading> Loading product data. Please wait. </template>
+      <template #empty> No products found. </template>
       <Column v-if="showId" sortable field="catalogProductId" header="Id"></Column>
       <Column v-if="showManufacturerUsername" sortable field="manufacturerUsername" header="Manufacturer Username"></Column>
       <Column v-if="showOrderId" sortable field="orderId" header="Order Associated">

@@ -92,7 +92,7 @@ const logout = async () => {
                   <i class="bi bi-files"></i>
                     Packages
             </li>
-            <router-link to="/transportPackages" class="nav-link">
+            <router-link to="/transport_packages" class="nav-link">
             <li  class="nav-item">
                   <i class="bi bi-files"></i>
                     Transport Packages   

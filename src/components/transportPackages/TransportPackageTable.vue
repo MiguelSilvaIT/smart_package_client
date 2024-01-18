@@ -6,6 +6,8 @@ import Column from 'primevue/column';
 import { useToast } from 'primevue/usetoast';
 import Toast from 'primevue/toast';
 import Card from 'primevue/card';
+import { FilterMatchMode } from 'primevue/api';
+import InputText from 'primevue/inputtext';
 
 const toast = useToast();
 const serverBaseUrl = inject("serverBaseUrl");
@@ -39,6 +41,10 @@ const editClick = (transportPackage) => {
   emit("edit", transportPackage);
 };
 
+const filters = ref({
+  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+});
+
 const selectedTransportPackage = ref();
 
 const onRowExpand = (event) => {
@@ -54,10 +60,20 @@ const onRowCollapse = (event) => {
   <DataTable v-model:expandedRows="selectedTransportPackage" @rowSelect="onRowExpand" @rowUnselect="onRowCollapse"
      v-model:selection="selectedTransportPackage" :value="transportPackages" 
      selectionMode="multiple" dataKey="id"
-     :metaKeySelection=false paginator sortField="id" :sortOrder="-1" :rows="30" stripedRows >
-      <Column v-if="showId" field="id" header="Id"></Column>
-      <Column v-if="showMaterial" field="material" header="Material"></Column>
-      <Column v-if="showType" field="type" header="Type"></Column>
+     :metaKeySelection=false paginator sortField="id" :sortOrder="1" :rows="30" stripedRows >
+     <template #header>
+          <div class="flex justify-content-end">
+              <span class="p-input-icon-left">
+                  <i class="pi pi-search" />
+                  <InputText v-model="filters['global'].value" placeholder="Keyword Search" />
+              </span>
+          </div>
+      </template>
+     <template #empty> No Transport Packages found. </template>
+      <template #loading> Loading Transport Package data. Please wait. </template>
+      <Column v-if="showId" sortable field="id" header="Id"></Column>
+      <Column v-if="showMaterial" sortable field="material" header="Material"></Column>
+      <Column v-if="showType" sortable field="type" header="Type"></Column>      
       <Column v-if="showEditButton" header="Edit">
           <template #body="slotProps">
               <button
@@ -69,31 +85,33 @@ const onRowCollapse = (event) => {
               </button>
           </template>
       </Column>
-        <template #expansion="slotProps">
-              <div class="expandedDiv">
-                <h5 class="ms-3">Transport Packages #{{ slotProps.data.id }}</h5>
-                <div class="contentContainer">
-                  <div>
-                    <p >
-                      <strong>Material:</strong> {{ slotProps.data.material }}
-                    </p>
-                    <p >
-                      <strong>Type:</strong> {{ slotProps.data.type }}
-                    </p>
-                  </div>
-                  <div>
-                    <p  >
-                        <strong>Sensors:</strong>  {{ slotProps.data.sensors }}
-                    </p>
-                    <p >
-                        <strong>Orders:</strong> {{ slotProps.data.orders }}
-                    </p>
-                  </div>                  
-                </div>
+      <template #expansion="slotProps" >
+          <div class="expandedDiv">
+            <h5 class="ms-3">Transport Package # {{ slotProps.data.id }}</h5>
+            <div class="contentContainer">
+              <div class="ms-1 mt-3">
+                <p >
+                  <strong>Id:</strong> {{ slotProps.data.id }}
+                </p>
+                <p >
+                  <strong> Material:</strong> {{ slotProps.data.material }}
+                </p>
+                <p>
+                  <strong> Type:</strong> {{ slotProps.data.type }}
+                </p>
               </div>
+              <div class=" ms-1 mt-3">
+                <p v-for="(transportPackage, index) in (slotProps.data.orders || [])" :key="index">
+                  <strong > Orders:</strong> {{ transportPackage.orders }}
+                </p>
+                <p v-for="(transportPackage, index) in (slotProps.data.products || [])" :key="index">
+                  <strong > Sensors:</strong> {{ transportPackage.sensors }}
+                </p>
+              </div>
+            </div>
+          </div>
         </template>
     </DataTable>
-  <Toast />
 </template>
 
 <style scoped>

@@ -15,7 +15,8 @@ const transportPackages = ref([])
 const loadTransportPackages = async () => {
   try {
       const response = await axios.get('transport_packages')
-      transportPackages.value = response.data.data
+      transportPackages.value = response.data
+
   } catch (error) {
     console.log(error)
     clearTransportPackages()

@@ -1,11 +1,12 @@
 <script setup>
 
-import { ref, watch, computed, inject, onMounted } from "vue";
+import { ref, watch, computed, onMounted } from "vue";
 
 import InputNumber from 'primevue/inputnumber';
 import Dropdown from 'primevue/dropdown';
 import InputText from 'primevue/inputtext';
 import axios from 'axios'; 
+
 
 const props = defineProps({
   product: {
@@ -27,31 +28,10 @@ const props = defineProps({
 const emit = defineEmits(["save", "cancel"]);
 
 const editingProduct = ref(props.product)
-//console.log("editingCategory -->" , editingCategory.value)
-const catalogProducts = ref([]); // Esta será a nossa lista de produtos do catálogo
-
-const fetchCatalogProducts = async () => {
-  try {
-    const response = await axios.get('products');
-    let products = response.data;
-    let uniqueProducts = products.filter((product, index, self) =>
-      index === self.findIndex((p) => p.catalogProductId === product.catalogProductId)
-    );
-    catalogProducts.value = uniqueProducts.map(product => ({ catalogProductId: product.catalogProductId }));
-    console.log('Produtos do catálogo carregados:', catalogProducts.value);
-  } catch (error) {
-    console.error('Erro ao buscar produtos do catálogo:', error);
-  }
-};
-
-const fetchProduct = async () => {
-  try {
-    const response = await axios.get('products/' + props.id);
-    product.value = response.data;
-  } catch (error) {
-    console.error('Erro ao buscar produto:', error);
-  }
-};
+const productManufacturer = ref(null)
+const catalogProductId = ref(null)
+const quantity = ref(0)
+const catalogProducts = ref([])
 
 watch(
   () => props.product,
@@ -69,24 +49,22 @@ const productTitle = computed( () => {
   })
 
 const save = () => {
-  if (editingProduct.value) {
-    editingProduct.value.product = editingProduct.value.catalogProductId;
-  }
-  emit("save", editingProduct.value);
+  emit("save", catalogProductId.value, productManufacturer.value, quantity.value);
 }
 
 const cancel = () => {
   emit("cancel", editingProduct.value);
 }
-/*
-const deleteProduct =  () => {
-  emit("deleteProduct", editingProduct.value);
-}*/
+
+const loadProductsCatalog = async () => {
+  const response = await axios.get('catalog_products')
+  catalogProducts.value = response.data
+  console.log(response.data)
+}
 
 onMounted(
   () => {
-    fetchCatalogProducts();
-    fetchProduct();
+    loadProductsCatalog()
   }
 );
 </script>
@@ -98,20 +76,23 @@ onMounted(
     <div class="d-flex flex-wrap mt-4 justify-content-between">
       <div class="w-75 pe-4">
         <div class="col mb-5 ms-xs-3">
-          <div class="p-float-label">
-            <InputText type="text" v-model="editingProduct.manufacturerUsername" :class="{ 'p-invalid': errors ? errors['manufacturerUsername'] : false }"/>
-            <label for="dd-paymentType">Manufacturer Username</label>
-            <field-error-message :errors="errors" fieldName="manufacturerUsername"></field-error-message>
+          <div class="col mb-3 ms-xs-3">
+            <span class="p-float-label">
+            <Dropdown v-model="catalogProductId" :options="catalogProducts" optionLabel="name" optionValue="id"/>
+            <label>Product Catalog Id</label>
+            </span>
           </div>
         </div>    
         <div class="mb-5 ">
           <span class="p-float-label">
-            <Dropdown v-model="editingProduct.catalogProductId" 
-              :options="catalogProducts" 
-              optionLabel="catalogProductId" 
-              :class="{ 'p-invalid': errors ? errors['catalogProductId'] : false }"/>
-            <label for="number-input">Catalog Product</label>
-            <field-error-message :errors="errors" fieldName="catalogProductId"></field-error-message>
+            <InputNumber v-model="quantity" :min="0" :max="100"  showButtons buttonLayout="horizontal" style="height: 3rem; width:8rem" decrementButtonClassName="p-button-secondary" incrementButtonClassName="p-button-secondary">
+              <template #incrementbuttonicon>
+                  <span class="pi pi-plus" />
+              </template>
+              <template #decrementbuttonicon>
+                  <span class="pi pi-minus" />
+              </template>
+          </InputNumber>
           </span>
         </div>
       </div>

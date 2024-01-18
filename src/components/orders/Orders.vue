@@ -1,13 +1,12 @@
 <script setup>
   import axios from 'axios'
-  import { ref, computed, onMounted, inject } from 'vue'
+  import { ref, computed, onMounted } from 'vue'
   import OrderTable from './OrderTable.vue'
   import {useRouter} from 'vue-router';
   import { useToast } from "vue-toastification"
 
   const toast = useToast()
   const router = useRouter()
-  const socket = inject('socket')
 
   const loadOrders = () => {
     // Change later when authentication is implemented

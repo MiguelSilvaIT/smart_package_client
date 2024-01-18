@@ -2,6 +2,7 @@
   import { ref, watch, computed } from 'vue'
   import Dropdown from 'primevue/dropdown';
   import InputText from 'primevue/inputtext';
+  import Listbox from 'primevue/listbox';
 
   const props = defineProps({
     order: {
@@ -14,7 +15,7 @@
     }
   })
 
-  const emit = defineEmits(['save', 'cancel'])
+  const emit = defineEmits(['save', 'cancel', 'transportPackageDetail'])
 
 
 
@@ -24,7 +25,10 @@
   })
 
 
+  const detailClick = (packId) => {
+      emit("transportPackageDetail", packId);
 
+  }
 
   const cancel = () => {
     emit('cancel', editingOrder.value)
@@ -85,34 +89,41 @@
             <field-error-message :errors="errors" fieldName="logistic_operator_name"></field-error-message>
           </span>
         </div>
-        <!--Lissta de produtos-->
-        <div class="mb-5">
-          <span class="p-float-label">
+         <!-- List of products -->
+         <div class="mb-5" v-if="order.products && order.products.length > 0">
+          <label for="number-input">Products</label>
+          <span class="p-float-label" v-for="product in order.products" :key="product.id">
             <InputText
               type="text"
-              v-for = "product in order.products"
               v-model="product.id"
               :class="{ 'p-invalid': errors ? errors['products'] : false }"
               readonly
             />
-            <label for="number-input">Products</label>
             <field-error-message :errors="errors" fieldName="products"></field-error-message>
           </span>
         </div>
-        <!--Lissta de pacotes de transporte-->
+        <div v-else>
+          <p>No products available.</p><br>
+        </div>
+        <!-- List of transport packages -->
         <div class="mb-5">
-          <span class="p-float-label">
+          <span class="p-float-label" v-if="order.transportPackages && order.transportPackages.length > 0">
             <InputText
               type="text"
               v-for = "transportPackage in order.transportPackages"
               v-model="transportPackage.id"
               :class="{ 'p-invalid': errors ? errors['transportPackages'] : false }"
               readonly
+              @click="detailClick(transportPackage.id)"
             />
             <label for="number-input">Transport Packages</label>
             <field-error-message :errors="errors" fieldName="transportPackages"></field-error-message>
           </span>
+          <div v-else>
+            <p>No transport packages available.</p><br>
+          </div>
         </div>
+       
       </div>
     </div>
     <div class="mb-3 d-flex justify-content-end">

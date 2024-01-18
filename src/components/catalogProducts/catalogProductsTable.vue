@@ -66,7 +66,7 @@ const hideDialog = () => {
 
 <template>
   <DataTable 
-        v-model:filters="filters"
+    v-model:filters="filters"
      :value="catalogProducts" 
      :metaKeySelection=false paginator sortField="id" :sortOrder="1" :rows="30" stripedRows
      :globalFilterFields="['id','name', 'description']">

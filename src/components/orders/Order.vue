@@ -28,6 +28,11 @@ const order = ref({})
     }
 
 
+    const transportPackageDetailClick = (packId) => {
+      // Replace this code to navigate to the transport package detail
+      router.push({ name: 'TransportPackage', params: { id: packId } })
+    }
+  
   const cancel = () => {
       // Replace this code to navigate back
       loadOrder(props.id)
@@ -62,7 +67,7 @@ const order = ref({})
 <template>
   <order-detail
     :order="order"
-
     :errors = errors
+    @transportPackageDetail="transportPackageDetailClick"
   ></order-detail>
 </template>

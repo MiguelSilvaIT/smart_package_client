@@ -99,6 +99,7 @@ const onRowCollapse = (event) => {
                 <p>
                   <strong> Type:</strong> {{ slotProps.data.type }}
                 </p>
+        
               </div>
               <div class=" ms-1 mt-3">
                 <p v-for="(transportPackage, index) in (slotProps.data.orders || [])" :key="index">

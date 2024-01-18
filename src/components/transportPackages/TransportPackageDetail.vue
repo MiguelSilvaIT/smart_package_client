@@ -63,6 +63,7 @@ const save = () => {
 const cancel = () => {
   emit("cancel", editingTransportPackage.value);
 }
+
 </script>
 
 <template>

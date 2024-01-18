@@ -1,13 +1,12 @@
 <script setup>
 import axios from 'axios'
 import { useToast } from "vue-toastification"
-import { ref, watch , computed, inject} from 'vue'
+import { ref, watch , computed} from 'vue'
 import TransportPackageDetail from "./TransportPackageDetail.vue"
 import { useRouter, onBeforeRouteLeave } from 'vue-router'
 
 const toast = useToast()
 const router = useRouter()
-const socket = inject('socket')
 
 const props = defineProps({
     id: {

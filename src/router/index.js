@@ -34,7 +34,7 @@ const router = createRouter({
     },
     {
       path: '/orders/:id',
-      name: 'order',
+      name: 'Order',
       component: Order,
       props: route => ({ id: parseInt(route.params.id) })
     },
@@ -71,18 +71,18 @@ const router = createRouter({
       component: Login
     },
     {
-      path: '/transportPackages',
+      path: '/transport_packages',
       name: 'transportPackages',
       component: TransportPackages
     },
     {
-      path: '/transportPackages/:id',
+      path: '/transport_packages/:id',
       name: 'TransportPackage',
       component: TransportPackage,
       props: route => ({ id: parseInt(route.params.id) })
     },
     {
-      path: '/transportPackages',
+      path: '/transport_packages',
       name: 'NewTransportPackage',
       component: TransportPackage,
       props: { id: -1 }

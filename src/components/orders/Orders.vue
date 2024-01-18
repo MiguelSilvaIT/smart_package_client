@@ -1,17 +1,18 @@
 <script setup>
   import axios from 'axios'
-  import { ref, computed, onMounted, inject } from 'vue'
-  import OrderTable from './OrderTable.vue'
-  import {useRouter} from 'vue-router';
-  import { useToast } from "vue-toastification"
+  import { ref, computed, onMounted } from 'vue'
+  import OrderTable from "./OrderTable.vue"
 
-  const toast = useToast()
-  const router = useRouter()
-  const socket = inject('socket')
+  import {useRouter} from 'vue-router';
+
+const router = useRouter()
+
+
+const orders = ref([])
 
   const loadOrders = () => {
     // Change later when authentication is implemented
-    axios.get('orders')
+    axios.get('orders/')
       .then((response) => {
         orders.value = response.data
         console.log(response.data)
@@ -20,8 +21,26 @@
         console.log(error)
       })
   }
+  
+  const props = defineProps({
+    ordersTitle: {
+      type: String,
+      default: 'Orders'
+    },
+    onlyCurrentOrders: {
+      type: Boolean,
+      default: false
+    }
+  })
 
-  const orders = ref([])
+
+  const showDetails = (order) => {
+    
+    router.push({ name: 'Order', params: { id: order.id } })
+}
+
+
+
   
   onMounted (() => {
     loadOrders()
@@ -29,11 +48,32 @@
 </script>
 
 <template>
-  <h3 class="mt-5 mb-3">Orders</h3>
+  <div class="d-flex justify-content-between">
+    <div class="mx-2">
+      <h3 class="mt-4">{{ ordersTitle }}</h3>
+    </div>
+  </div>
   <hr>
+
+  <div class="mx-2 mt-2">
+    <button
+      type="button"
+      class="btn btn-success px-4 btn-addorder"
+      @click="addOrder"
+    >
+      <i class="bi bi-xs bi-plus-circle"></i>&nbsp; Add Order
+    </button>
+  </div>
 
   <order-table
     :orders="orders"
+    :showId="true"
+    :showClient="true"
+    :showCreationDate="true"
+    :showStatus="true"
+    :showLogisticOperatorName="true"
+    :showDetailsButton="true"
+    @detail="showDetails"
   ></order-table>
 </template>
 
@@ -45,7 +85,7 @@
 .total-filtro {
   margin-top: 0.35rem;
 }
-.btn-addtask {
+.btn-addorder {
   margin-top: 1.85rem;
 }
 </style>

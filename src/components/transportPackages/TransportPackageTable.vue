@@ -33,7 +33,33 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+
 });
+
+const packageTypes = ref([
+  { name: 'Tertiary' , value: 'TERTIARY'},
+  { name: 'Secondary', value: 'SECONDARY'},
+  { name: 'Primary' , value: 'PRIMARY'},
+]);
+
+const materials = ref([
+  { name: 'Cardboard', value: 'cardboard' },
+  { name: 'Plastic', value: 'plastic' },
+  { name: 'Wood', value: 'wood' },
+  { name: 'Metal', value: 'metal' },
+  { name: 'Glass', value: 'glass' },
+  { name: 'Paper', value: 'paper' },
+  { name: 'Ceramic', value: 'ceramic' },
+  { name: 'Textile', value: 'textile' },
+  { name: 'Leather', value: 'leather' },
+  { name: 'Rubber', value: 'rubber' },
+  { name: 'Foil', value: 'foil' },
+  { name: 'Wax', value: 'wax' },
+  { name: 'Resin', value: 'resin' },
+  { name: 'Bamboo', value: 'bamboo' },
+  { name: 'Cork', value: 'cork' },
+  // Add more materials as needed
+]);
 
 const emit = defineEmits(["edit"]);
 
@@ -53,6 +79,33 @@ const onRowExpand = (event) => {
 const onRowCollapse = (event) => {
   toast.add({ severity: 'info', summary: 'Transport Package Collapsed', detail: event.data.name, life: 3000 });
 };
+
+const editingPackage = ref(null);
+const editingPackageType = ref(null);
+const editingPackageMaterial = ref(null);
+const showDialog = ref(false);
+
+const showEdit = (transportPackage,visible) => {
+  editingPackage.value = transportPackage
+  editingPackageType.value = transportPackage.type
+  editingPackageMaterial.value = transportPackage.material
+  showDialog.value = visible
+    
+};
+
+const hideDialog = () => {
+  showDialog.value = false
+}; 
+
+const editPackage = () => {
+  editingPackage.value.type = editingPackageType.value
+  editingPackage.value.material = editingPackageMaterial.value
+
+    emit("edit", editingPackage.value);
+    hideDialog()
+};
+
+
 
 </script>
 
@@ -78,7 +131,7 @@ const onRowCollapse = (event) => {
           <template #body="slotProps">
               <button
                 class="btn btn-xs btn-light"
-                @click="editClick(slotProps.data)"
+                @click="showEdit(slotProps.data,true)"
                 v-if="showEditButton"
               >
                 <i class="bi bi-xs bi-pencil"></i>
@@ -113,6 +166,26 @@ const onRowCollapse = (event) => {
           </div>
         </template>
     </DataTable>
+    <Dialog header="Change Transport Package" v-model:visible="showDialog" :modal="true" :closable="false">
+      <div class="mb-5 mt-4">
+          <span class="p-float-label">
+            <Dropdown v-model="editingPackageType" :options="packageTypes" optionLabel="name" optionValue="value"/>
+            <!-- //<InputText type="text" v-model="packageType"/> -->
+            <label>Type</label>
+          </span>
+        </div>
+        <div class="mb-5">
+          <span class="p-float-label">
+            <Dropdown v-model="editingPackageMaterial" :options="materials" optionLabel="name" optionValue="name"/>
+           <!-- <InputText type="text" v-model="packageMaterial" /> -->
+            <label>Material</label>
+          </span>
+        </div>
+      <div class="p-d-flex p-jc-end p-mt-3 mt-4">
+        <Button label="Confirm" class="m-3" @click="editPackage" />
+        <Button label="Cancel" class="p-button-secondary m-3" @click="hideDialog" />
+      </div>
+    </Dialog>
 </template>
 
 <style scoped>

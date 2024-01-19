@@ -4,15 +4,28 @@
   import OrderTable from "./OrderTable.vue"
 
   import {useRouter} from 'vue-router';
+  import {useUserStore} from '../../stores/user'
 
 const router = useRouter()
 
 
-const orders = ref([])
+  const orders = ref([])
+  const userStore = useUserStore()
 
-  const loadOrders = () => {
+  const loadOrders = async() => {
     // Change later when authentication is implemented
-    axios.get('orders/')
+    if(userStore.userType == 'Client'){
+      await axios.post('orders/my', userStore.user)
+      .then((response) => { 
+        orders.value = response.data
+        console.log(response.data)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+      return;
+    }
+    await axios.get('orders/')
       .then((response) => {
         orders.value = response.data
         console.log(response.data)

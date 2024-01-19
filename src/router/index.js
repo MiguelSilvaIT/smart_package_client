@@ -56,7 +56,7 @@ const router = createRouter({
     },
     {
       path:'/manageCatalogProducts',
-      name: 'catalogProducts',
+      name: 'manageCatalogProducts',
       component: ManageCatalogProducts,
     },
     {

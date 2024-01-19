@@ -76,13 +76,13 @@ const logout = async () => {
                   Sensors
             </li>
 
-           <router-link to="/orders" class="nav-link">
+           <router-link to="/orders" class="nav-link" v-if="userStore.userType == 'Client' || userStore.userType == 'LogisticsOperator'">
             <li class="nav-item" >
                   <i class="bi bi-files"></i>
                     Orders
             </li>
-            </router-link>
-            <router-link to="/products" class="nav-link">
+            </router-link >
+            <router-link to="/products" class="nav-link" v-if="userStore.userType == 'Manufacturer'">
               <li class="nav-item" >
                     <i class="bi bi-files"></i>
                       Products
@@ -100,11 +100,8 @@ const logout = async () => {
                   Catalog Products
             </li>
             </router-link>
-            <li class="nav-item"  >
-                  <i class="bi bi-files"></i>
-                    Packages
-            </li>
-            <router-link to="/transport_packages" class="nav-link">
+            
+            <router-link to="/transport_packages" class="nav-link" v-if="userStore.userType == 'LogisticsOperator'">
             <li  class="nav-item">
                   <i class="bi bi-files"></i>
                     Transport Packages   

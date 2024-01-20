@@ -32,10 +32,12 @@ const logout = async () => {
 
       <div class="collapse navbar-collapse justify-content-end">
         <ul class="navbar-nav">
+          <router-link to="/auth/register" class="nav-link">
           <li class="nav-item">
               <i class="bi bi-person-check-fill"></i>
               Register
           </li>
+          </router-link>
           <router-link to="/auth/login" class="nav-link">
           <li class="nav-item">
               <i class="bi bi-box-arrow-in-right"></i>
@@ -70,16 +72,23 @@ const logout = async () => {
                 <i class="bi bi-house"></i>
                 Home
               </router-link>
+
             </li>
             <li class="nav-item" >
-                <i class="bi bi-files"></i>
-                  Sensors
+              <router-link to="/sensors" class="nav-link">
+              <i class="bi bi-files"></i>
+                Sensors
+              </router-link>
+
             </li>
 
            <router-link to="/orders" class="nav-link" v-if="userStore.userType == 'Client' || userStore.userType == 'LogisticsOperator'">
             <li class="nav-item" >
-                  <i class="bi bi-files"></i>
-                    Orders
+              <router-link to="/orders" class="nav-link">
+              <i class="bi bi-files"></i>
+                Orders
+              </router-link>
+
             </li>
             </router-link >
             <router-link to="/products" class="nav-link" v-if="userStore.userType == 'Manufacturer'">

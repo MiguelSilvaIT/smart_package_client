@@ -256,19 +256,7 @@ const alterStatus = async () => {
           <p>No products available.</p><br>
         </div>
         
-        <div v-if="userStore.userType == 'LogisticsOperator'"> 
-          <h4 class="ms-3"> Transport Packages</h4>
-          <DataTable v-model:expandedRows="selectedTransportPackage" @rowSelect="detailClick"
-              v-model:selection="selectedTransportPackage" :value="order.transportPackages"
-              selectionMode="single" dataKey="id" v-if="userStore.userType == 'LogisticsOperator'"
-              :metaKeySelection=false paginator sortField="id" :sortOrder="1" :rows="5" stripedRows>
-            <template #empty> No transport packages found. </template>
-            <Column sortable field="id" header="Id"></Column>
-            <Column sortable field="material" header="Material"></Column>
-            <Column sortable field="type" header="Package Type"></Column>
-            <Column sortable field="volume" header="Max Volume"></Column>
-          </DataTable>
-        </div>
+
         <!-- List of transport packages -->
         <div class="mb-5">
           <span class="p-float-label" v-if="order.transportPackages && order.transportPackages.length > 0">

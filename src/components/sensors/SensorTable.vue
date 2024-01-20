@@ -78,7 +78,7 @@ const chartData = (observations) => {
 </script>
 
 <template>
-  <DataTable v-model:expandedRows="selectedSensor" @rowSelect="onRowExpand" @rowUnselect="onRowCollapse"
+  <DataTable v-model:filters="filters" v-model:expandedRows="selectedSensor" @rowSelect="onRowExpand" @rowUnselect="onRowCollapse"
      v-model:selection="selectedSensor" :value="sensors"
      selectionMode="multiple" dataKey="id" 
      :metaKeySelection=false paginator sortField="id" :sortOrder="1" :rows="30" >

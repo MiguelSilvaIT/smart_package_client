@@ -49,7 +49,6 @@ const secondaryPackage = ref([]);
 const terciaryPackage = ref([]);
 
 watch(props.products, (val) => {
-  terciaryPackage.value = Array.from({ length: val.length }, () => ({}));
   console.log(terciaryPackage.value)
 });
 
@@ -96,7 +95,7 @@ const getPackage = (product,packType) => {
 </script>
 
 <template>
-  <DataTable v-model:expandedRows="selectedProduct" @rowSelect="onRowExpand" @rowUnselect="onRowCollapse"
+  <DataTable v-model:filters="filters" v-model:expandedRows="selectedProduct" @rowSelect="onRowExpand" @rowUnselect="onRowCollapse"
      v-model:selection="selectedProduct" :value="products"
      selectionMode="multiple" dataKey="id" 
      :metaKeySelection=false paginator sortField="id" :sortOrder="1" :rows="30" >

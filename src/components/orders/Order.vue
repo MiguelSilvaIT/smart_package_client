@@ -41,9 +41,10 @@ const  loadOrder = async (id) => {
 }
 
 
-const transportPackageDetailClick = (packId) => {
+const transportPackageDetailClick = (packId , order) => {
   // Replace this code to navigate to the transport package detail
-  router.push({ name: 'TransportPackage', params: { id: packId } })
+  //debug orderId
+  router.push({ name: 'TransportPackage', params: {  orderId : order , id: packId} })
 }
 
 const cancel = () => {

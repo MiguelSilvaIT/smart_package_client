@@ -37,8 +37,8 @@
   })
 
 
-  const detailClick = (packId) => {
-      emit("transportPackageDetail", packId);
+  const detailClick = (packId, orderId) => {
+    emit("transportPackageDetail", packId , orderId);
 
   }
 
@@ -129,7 +129,7 @@
               v-model="transportPackage.id"
               :class="{ 'p-invalid': errors ? errors['transportPackages'] : false }"
               readonly
-              @click="detailClick(transportPackage.id)"
+              @click="detailClick(transportPackage.id , props.order.id)"
             />
             <label for="number-input">Transport Packages(click for more details)</label>
             <field-error-message :errors="errors" fieldName="transportPackages"></field-error-message>

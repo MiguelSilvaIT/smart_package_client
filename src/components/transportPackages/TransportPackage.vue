@@ -12,6 +12,10 @@ const props = defineProps({
     id: {
       type: Number,
       default: null
+    },
+    orderId: {
+      type: Number,
+      default: null
     }
 })
 
@@ -140,6 +144,7 @@ onBeforeRouteLeave((to, from, next) => {
   
   <transportPackage-detail
     :operationType="operation"
+    :orderId="orderId"
     :transportPackage="transportPackage"
     :errors="errors"
     @save="save"

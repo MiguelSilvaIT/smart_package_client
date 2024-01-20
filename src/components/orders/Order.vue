@@ -16,6 +16,8 @@ const order = ref({})
 
 const observations = ref([])
 
+const notAssociatedTransportPackages = ref([])
+
 const  loadOrder = async (id) => {
 
   await axios.get('orders/' + id)
@@ -29,8 +31,15 @@ const  loadOrder = async (id) => {
 
   await axios.get('observations/order/' + id)
     .then((response) => {
-      console.log("teste" + response.data)
       observations.value = response.data
+    })
+    .catch((error) => {
+      console.log(error)
+    })
+
+  await axios.get('orders/'+id+'/' + 'not/' + 'transportPackages')
+    .then((response) => {
+      notAssociatedTransportPackages.value = response.data
     })
     .catch((error) => {
       console.log(error)
@@ -39,6 +48,8 @@ const  loadOrder = async (id) => {
 
 
 }
+
+
 
 
 const transportPackageDetailClick = (packId , order) => {
@@ -79,5 +90,5 @@ watch(
 
 
 <template>
-  <order-detail :order="order" :errors=errors :observations = "observations"  @transportPackageDetail="transportPackageDetailClick"></order-detail>
+  <order-detail :order="order" :errors=errors :observations = "observations" :notAssociatedTransportPackages = "notAssociatedTransportPackages" @transportPackageDetail="transportPackageDetailClick"></order-detail>
 </template>

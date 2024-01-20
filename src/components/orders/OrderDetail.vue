@@ -1,52 +1,98 @@
 <script setup>
-  import { ref, watch, computed,onMounted } from 'vue'
-  import Dropdown from 'primevue/dropdown';
-  import axios from 'axios'
-  import InputText from 'primevue/inputtext';
-  import Listbox from 'primevue/listbox';
+import { ref, watch, computed, onMounted } from 'vue'
+import Dropdown from 'primevue/dropdown';
+import axios from 'axios'
+import InputText from 'primevue/inputtext';
+import Listbox from 'primevue/listbox';
+import { useRouter } from "vue-router"
 
-  const props = defineProps({
-    order: {
-      type: Object,
-      required: true
-    },
-    observations: {
-      type: Array,
-      default: () => [],
-    },
-    errors: {
-      type: Object,
-      default: null
-    }
-
-  })
-
-  const emit = defineEmits(['save', 'cancel', 'transportPackageDetail'])
-
-
-  
-  const observations = ref(props.observations)
-  console.log("obs --> " , props.observations)
+const router = useRouter()
 
 
 
-  const uniqueSensorNames = computed(() => [...new Set(props.observations.map(item => item.sensorName))]);
 
-  const orderTitle = computed(() => {
-    return  'Order ' + props.order.id
-  })
-
-
-  const detailClick = (packId, orderId) => {
-    emit("transportPackageDetail", packId , orderId);
-
+const props = defineProps({
+  order: {
+    type: Object,
+    required: true
+  },
+  observations: {
+    type: Array,
+    default: () => [],
+  },
+  notAssociatedTransportPackages: {
+    type: Array,
+    default: () => [],
+  },
+  errors: {
+    type: Object,
+    default: null
   }
 
-  const cancel = () => {
-    emit('cancel', editingOrder.value)
-  }
+})
 
-  //onMounted LoadObservations
+const emit = defineEmits(['save', 'cancel', 'transportPackageDetail'])
+
+
+
+console.log("not associated transport packages --> ", props.notAssociatedTransportPackages)
+
+
+const allTransportPackages = ref([])
+
+const newStatus = ref('')
+
+const addTransportPackageToOrder = async (pkId, orderId) => {
+  await axios.get("transport_packages/" + pkId + "/orders/" + orderId)
+    .then((response) => {
+      console.log(response.data)
+    })
+    .catch((error) => {
+      console.log(error)
+    })
+
+    window.location.reload()
+}
+
+//array with status options
+const statusOptions = computed(() => {
+  return ['PENDING', 'PROCESSING', 'ON_GOING' , 'DELIVERED' , 'CANCELED']
+})
+
+
+
+const uniqueSensorNames = computed(() => [...new Set(props.observations.map(item => item.sensorName))]);
+
+const orderTitle = computed(() => {
+  return 'Order ' + props.order.id
+})
+
+
+const detailClick = (packId, orderId) => {
+  emit("transportPackageDetail", packId, orderId);
+
+}
+
+const cancel = () => {
+  emit('cancel', editingOrder.value)
+}
+
+const alterStatus = async () => {
+
+  console.log("new status --> ", newStatus.value)
+  await axios.patch("orders/" + props.order.id , {status : newStatus.value})
+    .then((response) => {
+      console.log(response.data)
+    })
+    .catch((error) => {
+      console.log(error)
+    })
+    window.location.reload()
+
+}
+
+//ao alterar a seleção do dropdown, fazer um post request
+
 
 </script>
 
@@ -58,62 +104,51 @@
       <div class="w-75 pe-4">
         <div class="col mb-5 ms-xs-3">
           <div class="p-float-label">
-            <InputText
-              type="text"
-              v-model="order.clientUsername"
-              :class="{ 'p-invalid': errors ? errors['clientUsername'] : false }"
-              readonly
-            />
+            <InputText type="text" v-model="order.clientUsername"
+              :class="{ 'p-invalid': errors ? errors['clientUsername'] : false }" readonly />
             <label for="dd-paymentType">Client Username</label>
             <field-error-message :errors="errors" fieldName="name"></field-error-message>
           </div>
         </div>
         <div class="mb-5">
           <span class="p-float-label">
-            <InputText
-              type="text"
-              v-model="order.creation_date"
-              :class="{ 'p-invalid': errors ? errors['creation_date'] : false }"
-              readonly
-            />
+            <InputText type="text" v-model="order.creation_date"
+              :class="{ 'p-invalid': errors ? errors['creation_date'] : false }" readonly />
             <label for="number-input">Creation Date</label>
             <field-error-message :errors="errors" fieldName="creation_date"></field-error-message>
           </span>
         </div>
         <div class="mb-5">
           <span class="p-float-label">
-            <InputText
-              type="text"
-              v-model="order.status"
-              :class="{ 'p-invalid': errors ? errors['status'] : false }"
-              readonly
-            />
-            <label for="number-input">Status</label>
+            <InputText type="text" v-model="order.status" :class="{ 'p-invalid': errors ? errors['status'] : false }"
+              readonly />
+            <label for="number-input">Actual Status</label>
             <field-error-message :errors="errors" fieldName="status"></field-error-message>
           </span>
         </div>
+        <!-- Select dropdown box with status -->
+        <div class="mb-5">
+          <label for="dd-status">Select <b>NEW</b> Status</label>
+          <Dropdown v-model="newStatus" :options="statusOptions"
+            :class="{ 'p-invalid': errors ? errors['status'] : false }" />
+            <button type="button" class="btn btn-light px-5" @click="alterStatus()">Update Status</button>
+          <field-error-message :errors="errors" fieldName="status"></field-error-message>
+          
+        </div>        
         <div class="mb-5">
           <span class="p-float-label">
-            <InputText
-              type="text"
-              v-model="order.logisticsOperatorUsername"
-              :class="{ 'p-invalid': errors ? errors['logistic_operator_name'] : false }"
-              readonly
-            />
+            <InputText type="text" v-model="order.logisticsOperatorUsername"
+              :class="{ 'p-invalid': errors ? errors['logistic_operator_name'] : false }" readonly />
             <label for="number-input">Logistic Operator</label>
             <field-error-message :errors="errors" fieldName="logistic_operator_name"></field-error-message>
           </span>
         </div>
-         <!-- List of products -->
-         <div class="mb-5" v-if="order.products && order.products.length > 0">
+        <!-- List of products -->
+        <div class="mb-5" v-if="order.products && order.products.length > 0">
           <label for="number-input">Products</label>
           <span class="p-float-label" v-for="product in order.products" :key="product.id">
-            <InputText
-              type="text"
-              v-model="product.id"
-              :class="{ 'p-invalid': errors ? errors['products'] : false }"
-              readonly
-            />
+            <InputText type="text" v-model="product.id" :class="{ 'p-invalid': errors ? errors['products'] : false }"
+              readonly />
             <field-error-message :errors="errors" fieldName="products"></field-error-message>
           </span>
         </div>
@@ -123,14 +158,9 @@
         <!-- List of transport packages -->
         <div class="mb-5">
           <span class="p-float-label" v-if="order.transportPackages && order.transportPackages.length > 0">
-            <InputText
-              type="text"
-              v-for = "transportPackage in order.transportPackages"
-              v-model="transportPackage.id"
-              :class="{ 'p-invalid': errors ? errors['transportPackages'] : false }"
-              readonly
-              @click="detailClick(transportPackage.id , props.order.id)"
-            />
+            <InputText type="text" v-for="transportPackage in order.transportPackages" v-model="transportPackage.id"
+              :class="{ 'p-invalid': errors ? errors['transportPackages'] : false }" readonly
+              @click="detailClick(transportPackage.id, props.order.id)" />
             <label for="number-input">Transport Packages(click for more details)</label>
             <field-error-message :errors="errors" fieldName="transportPackages"></field-error-message>
           </span>
@@ -139,14 +169,42 @@
           </div>
         </div>
 
-        <div class="mb-5" v-for="sensor in uniqueSensorNames" >
-          <h2>{{sensor}}</h2>
+        <!-- Table with all transport packages not associated-->
+        <h2>Transport Packages Not Associated</h2>
+        <div class="mb-5" >
+          <table>
+            <tr>
+              <th>Id</th>
+              <th>Type</th>
+              <th>Material</th>
+              <th>Volume</th>
+              <th>Add</th>
+            </tr>
+            {{ console.log("notAssociatedTransportPackages ii --> ", notAssociatedTransportPackages)   }}
+            <tr v-for="tp in notAssociatedTransportPackages" :key="tp.id">
+              {{ console.log("tp --> ", tp)  }}
+                <td>{{ tp.id }}</td>
+                <td>{{ tp.type }}</td>
+                <td>{{ tp.material }}</td>
+                <td>{{ tp.volume }}</td>
+                <td><button type="button" class="btn btn-light px-5" @click="addTransportPackageToOrder(tp.id , props.order.id)">Add</button></td>
+            </tr>
+          </table>
+        </div>
+
+
+
+
+
+
+        <div class="mb-5" v-for="sensor in uniqueSensorNames">
+          <h2>{{ sensor }}</h2>
           <table>
             <tr>
               <th>Value</th>
               <th>Time</th>
             </tr>
-            <tr v-for="obs in props.observations" :key="obs.id" >
+            <tr v-for="obs in props.observations" :key="obs.id">
               <template v-if="obs.sensorName == sensor">
                 <td>{{ obs.value }}</td>
                 <td>{{ obs.date }}</td>
@@ -154,7 +212,7 @@
             </tr>
           </table>
         </div>
-       
+
       </div>
     </div>
     <div class="mb-3 d-flex justify-content-end">
@@ -172,6 +230,7 @@
 .total_hours {
   width: 26rem;
 }
+
 .checkCompleted {
   min-height: 2.375rem;
 }

@@ -8,6 +8,8 @@ import Login from '../components/auth/Login.vue'
 import TransportPackage from '../components/transportPackages/TransportPackage.vue'
 import TransportPackages from '../components/transportPackages/TransportPackages.vue'
 import CatalogProducts from '../components/catalogProducts/CatalogProducts.vue'
+import Sensors from '../components/sensors/Sensors.vue'
+import Sensor from '../components/sensors/Sensor.vue'
 import { useUserStore } from '../stores/user.js'
 
 const router = createRouter({
@@ -17,14 +19,6 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: HomeView
-    },
-    {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue')
     },
     {
       path: '/orders',
@@ -49,7 +43,7 @@ const router = createRouter({
       props: route => ({ id: parseInt(route.params.id) })
     },
     {
-      path:'/catalogProducts',
+      path:'/catalog_products',
       name: 'catalogProducts',
       component: CatalogProducts,
     },
@@ -81,31 +75,27 @@ const router = createRouter({
       component: TransportPackage,
       props: { id: -1 }
     },
+    {
+      path: '/sensors',
+      name: 'Sensors',
+      component: Sensors,
+    },
+    {
+      path: '/sensors/:id',
+      name: 'Sensor',
+      component: Sensor,
+      props: route => ({ id: parseInt(route.params.id) })
+    },
+    {
+      path: '/sensors',
+      name: 'NewSensor',
+      component: Sensor,
+      props: { id: -1 }
+    },
     /*{
       path: '/reports',
       name: 'Reports',
       component: Report
-    },
-    {
-      path: '/adminReports',
-      name: 'AdminReports',
-      component: AdminReports
-    },
-    
-    {
-      path: '/password',
-      name: 'ChangePassword',
-      component: ChangePassword
-    },
-    {
-      path: '/dashboard',
-      name: 'Dashboard',
-      component: Dashboard
-    },
-    {
-      path: '/users',
-      name: 'Users',
-      component: Users,
     },
     {
       path: '/admins/new',
@@ -113,20 +103,7 @@ const router = createRouter({
       component: User,
       props: { id: -1 }
     },
-    {
-      path: '/transactions/:id',
-      name: 'Transaction',
-      component: Transaction,
-      //props: true
-      // Replaced with the following line to ensure that id is a number
-      props: route => ({ id: parseInt(route.params.id) })
-    },
-    {
-      path: "/transactions/new",
-      name: "NewTransaction",
-      component: Transaction,
-      props: { id: -1 },
-    },*/
+    */
   ]
 })
 

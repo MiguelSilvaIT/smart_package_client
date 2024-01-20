@@ -31,22 +31,6 @@ const confirmationLeaveDialog = ref(null)
 // String with the JSON representation after loading the project (new or edit)
 let originalValueStr = ''
 
-const loadUser = async (id) => {
-  originalValueStr = ''
-  errors.value = null
-  if (!id || (id < 0)) {
-    user.value = newUser()
-  } else {
-      try {
-        const response = await axios.get('users/' + id)
-        user.value = response.data.data
-        originalValueStr = JSON.stringify(user.value)
-      } catch (error) {
-        console.log(error)
-      }
-  }
-}
-
 const save = async () => {
   errors.value = null
   try {

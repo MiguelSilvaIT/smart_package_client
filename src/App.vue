@@ -82,6 +82,7 @@ const logout = async () => {
 
             </li>
 
+           <router-link to="/orders" class="nav-link" v-if="userStore.userType == 'Client' || userStore.userType == 'LogisticsOperator'">
             <li class="nav-item" >
               <router-link to="/orders" class="nav-link">
               <i class="bi bi-files"></i>
@@ -89,23 +90,27 @@ const logout = async () => {
               </router-link>
 
             </li>
-            <router-link to="/products" class="nav-link">
+            </router-link >
+            <router-link to="/products" class="nav-link" v-if="userStore.userType == 'Manufacturer'">
               <li class="nav-item" >
                     <i class="bi bi-files"></i>
                       Products
               </li>
             </router-link>
-            <router-link to="/catalog_products" class="nav-link">
+            <router-link to="/catalogProducts" class="nav-link" v-if="userStore.userType == 'Client'">
             <li class="nav-item" >
                   <i class="bi bi-files"></i>
                   Catalog Products
             </li>
             </router-link>
-            <li class="nav-item"  >
+            <router-link to="/manageCatalogProducts" class="nav-link" v-if="userStore.userType == 'Manufacturer'">
+            <li class="nav-item" >
                   <i class="bi bi-files"></i>
-                    Packages
+                  Catalog Products
             </li>
-            <router-link to="/transport_packages" class="nav-link">
+            </router-link>
+            
+            <router-link to="/transport_packages" class="nav-link" v-if="userStore.userType == 'LogisticsOperator'">
             <li  class="nav-item">
                   <i class="bi bi-files"></i>
                     Transport Packages   

@@ -10,6 +10,7 @@ import TransportPackages from '../components/transportPackages/TransportPackages
 import CatalogProducts from '../components/catalogProducts/CatalogProducts.vue'
 import Sensors from '../components/sensors/Sensors.vue'
 import Sensor from '../components/sensors/Sensor.vue'
+import ManageCatalogProducts from '../components/catalogProducts/ManageCatalogProducts.vue'
 import { useUserStore } from '../stores/user.js'
 
 const router = createRouter({
@@ -27,7 +28,7 @@ const router = createRouter({
     },
     {
       path: '/orders/:id',
-      name: 'order',
+      name: 'Order',
       component: Order,
       props: route => ({ id: parseInt(route.params.id) })
     },
@@ -46,6 +47,11 @@ const router = createRouter({
       path:'/catalog_products',
       name: 'catalogProducts',
       component: CatalogProducts,
+    },
+    {
+      path:'/manageCatalogProducts',
+      name: 'manageCatalogProducts',
+      component: ManageCatalogProducts,
     },
     {
       path: '/products',

@@ -42,7 +42,7 @@ const loadTransportPackages = async (id) => {
   } else {
       try {
         const response = await axios.get('transport_packages/' + id)
-        transportPackage.value = response.data.data
+        transportPackage.value = response.data
         originalValueStr = JSON.stringify(transportPackage.value)
       } catch (error) {
         console.log(error)

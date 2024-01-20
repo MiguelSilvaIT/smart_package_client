@@ -67,7 +67,6 @@
             
         }
     }
-
 </script>
 
 <template>
@@ -87,7 +86,6 @@
         </div>
     </form>
     <CatalogProductsGrid :catalogProducts="products" @addCart="addToCart" />
-   <!-- <catalogProducts-grid :products="products" ></catalogProducts-grid>  -->
 </template>
 
 <style scoped>

@@ -62,7 +62,7 @@ onMounted(() => {
   <div class="mx-2 mt-2  mb-4 d-flex justify-content-between">
     <Button type="button" class="border-round-xs"  @click="addProduct">
       <i class="bi bi-xs bi-plus-circle"></i>&nbsp;
-      Add Product
+      Add Stock
     </Button>
   </div>
   <product-table :products="products" @edit="editProduct"></product-table>

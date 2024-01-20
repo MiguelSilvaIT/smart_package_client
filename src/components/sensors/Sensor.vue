@@ -2,12 +2,10 @@
 import axios from 'axios'
 import { useToast } from "vue-toastification"
 import { ref, watch , computed} from 'vue'
-import ProductDetail from "./ProductDetail.vue"
+import SensorDetail from "./SensorDetail.vue"
 import { useRouter, onBeforeRouteLeave } from 'vue-router'
-import { useUserStore } from '../../stores/user'
 
-const userStore = useUserStore()
-const toast = useToast() 
+const toast = useToast()
 const router = useRouter()
 
 const props = defineProps({
@@ -17,34 +15,32 @@ const props = defineProps({
     }
 })
 
-const newProduct = () => {
+const newSensor = () => {
     return {
       id: null,
-      catalogProductId: '',
-      manufacturerUsername: '',
-      orderId: '',
-      productPackages: [],
+      name: '',
+      observations: [],
     }
 }
 
-const product = ref(newProduct())
+const sensor = ref(newSensor())
 
 const errors = ref(null)
 const confirmationLeaveDialog = ref(null)
 // String with the JSON representation after loading the project (new or edit)
 let originalValueStr = ''
 
-const loadProduct = async (id) => {
+const loadSensor = async (id) => {
   originalValueStr = ''
   errors.value = null
   if (!id || (id < 0)) {
-    product.value = newProduct()
-    originalValueStr = JSON.stringify(product.value)
+    sensor.value = newSensor()
+    originalValueStr = JSON.stringify(sensor.value)
   } else {
       try {
-        const response = await axios.get('products/' + id)
-        product.value = response.data.data
-        originalValueStr = JSON.stringify(product.value)
+        const response = await axios.get('sensors/' + id)
+        sensor.value = response.data
+        originalValueStr = JSON.stringify(sensor.value)
       } catch (error) {
         console.log(error)
       }
@@ -54,14 +50,14 @@ const loadProduct = async (id) => {
 const operation = computed( () => (!props.id || props.id < 0) ? 'insert' : 'update')
 
 
-const save =  (catalogProduct, quantity) => {
+const save =  (name) => {
   if (operation.value == 'insert') {
-    axios.post('products', {"catalogProductId": catalogProduct , "manufacturerUsername": userStore.userUsername, "quantity": quantity})
+    axios.post('sensors', {"name": name})
       .then((response) => {
-        toast.success(response.data)
+        toast.success('Sensor Created')
         console.dir(response.data.data)
-        originalValueStr = JSON.stringify(product.value)
-        router.push({name:'Products'})
+        originalValueStr = JSON.stringify(sensor.value)
+        router.push({name:'Sensors'})
       })
       .catch((error) => {
         if (error.response && error.response.status == 422) {
@@ -70,9 +66,9 @@ const save =  (catalogProduct, quantity) => {
         }
       })
   } else {
-    axios.put('products/' + id, product.value)
+    axios.put('sensors/' + id, sensor.value)
       .then((response) => {
-        toast.success('Product Updated')
+        toast.success('Sensor Updated')
         console.dir(response.data.data)
       })
       .catch((error) => {
@@ -91,7 +87,7 @@ const cancel =  () => {
 watch(
   () => props.id,
   (newValue) => {
-      loadProduct(newValue)
+      loadSensor(newValue)
     },
   {immediate: true}  
 )
@@ -105,7 +101,7 @@ const leaveConfirmed = () => {
 
 onBeforeRouteLeave((to, from, next) => {
   nextCallBack = null
-  let newValueStr = JSON.stringify(product.value)
+  let newValueStr = JSON.stringify(sensor.value)
   if (originalValueStr != newValueStr) {
     // Some value has changed - only leave after confirmation
     nextCallBack = next
@@ -127,11 +123,11 @@ onBeforeRouteLeave((to, from, next) => {
   >
   </confirmation-dialog>  
 
-  <product-detail
+  <sensor-detail
     :operationType="operation"
-    :product="product"
+    :sensor="sensor"
     :errors="errors"
     @save="save"
     @cancel="cancel"
-  ></product-detail>
+  ></sensor-detail>
 </template>

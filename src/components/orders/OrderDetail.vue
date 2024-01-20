@@ -154,47 +154,9 @@ const alterStatus = async () => {
     <hr />
     <div class="d-flex flex-wrap mt-4 justify-content-between">
       <div class="w-75 pe-4">
-        <div class="col mb-5 ms-xs-3">
-          <div class="p-float-label">
-            <InputText type="text" v-model="order.clientUsername"
-              :class="{ 'p-invalid': errors ? errors['clientUsername'] : false }" readonly />
-            <label for="dd-paymentType">Client Username</label>
-            <field-error-message :errors="errors" fieldName="name"></field-error-message>
-          </div>
-        </div>
-        <div class="mb-5">
-          <span class="p-float-label">
-            <InputText type="text" v-model="order.creation_date"
-              :class="{ 'p-invalid': errors ? errors['creation_date'] : false }" readonly />
-            <label for="number-input">Creation Date</label>
-            <field-error-message :errors="errors" fieldName="creation_date"></field-error-message>
-          </span>
-        </div>
-        <div class="mb-5">
-          <span class="p-float-label">
-            <InputText type="text" v-model="order.status" :class="{ 'p-invalid': errors ? errors['status'] : false }"
-              readonly />
-            <label for="number-input">Actual Status</label>
-            <field-error-message :errors="errors" fieldName="status"></field-error-message>
-          </span>
-        </div>
         <!-- Select dropdown box with status -->
-        <div class="mb-5">
-          <label for="dd-status">Select <b>NEW</b> Status</label>
-          <Dropdown v-model="newStatus" :options="statusOptions"
-            :class="{ 'p-invalid': errors ? errors['status'] : false }" />
-            <button type="button" class="btn btn-light px-5" @click="alterStatus()">Update Status</button>
-          <field-error-message :errors="errors" fieldName="status"></field-error-message>
-          
-        </div>        
-        <div class="mb-5">
-          <span class="p-float-label">
-            <InputText type="text" v-model="order.logisticsOperatorUsername"
-              :class="{ 'p-invalid': errors ? errors['logistic_operator_name'] : false }" readonly />
-            <label for="number-input">Logistic Operator</label>
-            <field-error-message :errors="errors" fieldName="logistic_operator_name"></field-error-message>
-          </span>
-        </div>
+        
+        
         <div class="flex">
             <div class="p-float-label">
               <InputText
@@ -242,7 +204,15 @@ const alterStatus = async () => {
               <field-error-message :errors="errors" fieldName="logistic_operator_name"></field-error-message>
             </span>
           </div>
-        </div> <!--AAAAAAAA-->  
+        </div>
+          <div class="mb-5">
+            <label for="dd-status">Select <b>NEW</b> Status</label>
+            <Dropdown v-model="newStatus" :options="statusOptions"
+              :class="{ 'p-invalid': errors ? errors['status'] : false }" />
+              <button type="button" class="btn btn-light px-5" @click="alterStatus()">Update Status</button>
+            <field-error-message :errors="errors" fieldName="status"></field-error-message>
+          </div>        
+         <!--AAAAAAAA-->  
         <!-- List of products -->
         <div class="mb-5" v-if="order.products && order.products.length > 0">
           <label for="number-input">Products</label>
@@ -258,17 +228,15 @@ const alterStatus = async () => {
         
 
         <!-- List of transport packages -->
-        <div class="mb-5">
-          <span class="p-float-label" v-if="order.transportPackages && order.transportPackages.length > 0">
-            <InputText type="text" v-for="transportPackage in order.transportPackages" v-model="transportPackage.id"
-              :class="{ 'p-invalid': errors ? errors['transportPackages'] : false }" readonly
-              @click="detailClick(transportPackage.id, props.order.id)" />
-            <label for="number-input">Transport Packages(click for more details)</label>
-            <field-error-message :errors="errors" fieldName="transportPackages"></field-error-message>
-          </span>
-          <div v-else>
-            <p>No transport packages available.</p><br>
-          </div>
+        <div v-if="userStore.userType == 'LogisticsOperator'"> 
+          <h4 class="ms-3"> Transport Packages</h4>
+          <DataTable :value="order.transportPackages" v-if="userStore.userType == 'LogisticsOperator'" paginator sortField="id" :sortOrder="1" :rows="5" stripedRows>
+            <template #empty> No transport packages found. </template>
+            <Column sortable field="id" header="Id"></Column>
+            <Column sortable field="material" header="Material"></Column>
+            <Column sortable field="type" header="Package Type"></Column>
+            <Column sortable field="volume" header="Max Volume"></Column>
+          </DataTable>
         </div>
 
         <div class="mt-4" v-for="(observations, sensorType) in observationBySensor" :key="sensorType">

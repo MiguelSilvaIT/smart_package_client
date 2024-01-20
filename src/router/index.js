@@ -5,7 +5,6 @@ import Orders from '../components/orders/Orders.vue'
 import Product from '../components/products/Product.vue'
 import Products from '../components/products/Products.vue'
 import Login from '../components/auth/Login.vue'
-import TransportPackage from '../components/transportPackages/TransportPackage.vue'
 import TransportPackages from '../components/transportPackages/TransportPackages.vue'
 import CatalogProducts from '../components/catalogProducts/CatalogProducts.vue'
 import Sensors from '../components/sensors/Sensors.vue'
@@ -68,19 +67,6 @@ const router = createRouter({
       path: '/transport_packages',
       name: 'transportPackages',
       component: TransportPackages
-    },
-    {
-      path: '/transport_packages/:id/order/:orderId',
-      name: 'TransportPackage',
-      component: TransportPackage,
-      props: route => ({ id: parseInt(route.params.id) ,  orderId: parseInt(route.params.orderId) }),
-       
-    },
-    {
-      path: '/transport_packages',
-      name: 'NewTransportPackage',
-      component: TransportPackage,
-      props: { id: -1 }
     },
     {
       path: '/sensors',

@@ -101,7 +101,7 @@ const chartData = (observations) => {
               <p>
                 <strong> Sensor Name:</strong> {{ slotProps.data.name }}
               </p>
-              <div v-if="slotProps.data.name === 'GPS'">
+              <div v-if="slotProps.data.sensorType === 'LOCATION'">
                 <DataTable :value="slotProps.data.observations" paginator :rows="5" tableStyle="min-width: 50rem" stripedRows >
                   <Column field="value" header="Value"></Column>
                   <Column field="date" header="Date" >

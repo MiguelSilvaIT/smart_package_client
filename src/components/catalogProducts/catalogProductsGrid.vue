@@ -15,7 +15,7 @@ const props = defineProps({
 
 
 }); 
-
+console.log(props.catalogProducts)
 // const catalogProducts = ref(Object.assign({}, props.catalogProducts))
 
 
@@ -31,6 +31,12 @@ const addCart = (product) => {
 
 <template>
     <div class="flex flex-wrap">
+        <div v-if="props.catalogProducts.length == 0">
+            <div class="text-center">
+                <br>
+                <div class="text-2xl font-bold">No products found</div>
+            </div>
+        </div>
         <div class="col-12 md:col-4" style="height: 20rem; width:24rem" v-for="product in props.catalogProducts" :key="product.id">
             <div class="card m-3 border-1 surface-border">
                 <div class="flex align-items-center justify-content-between">

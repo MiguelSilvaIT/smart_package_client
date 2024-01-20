@@ -11,7 +11,6 @@ const router = useRouter()
 
 
 import { roundToNearestMinutes } from 'date-fns';
-import {useRouter} from 'vue-router';
 import {useUserStore} from '../../stores/user'
 
 const props = defineProps({
@@ -34,7 +33,8 @@ const props = defineProps({
 
 })
 
-const emit = defineEmits(['save', 'cancel', 'transportPackageDetail'])
+const emit = defineEmits(['save', 'cancel','transportPackageDetail'])
+
 
 
 
@@ -65,8 +65,6 @@ const statusOptions = computed(() => {
 
 
 const uniqueSensorNames = computed(() => [...new Set(props.observations.map(item => item.sensorName))]);
-  const emit = defineEmits(['save', 'transportPackageDetail'])
-  const router = useRouter()
   const userStore = useUserStore()
 
   const selectedTransportPackage = ref();
@@ -92,14 +90,9 @@ const detailClick = (packId, orderId) => {
   emit("transportPackageDetail", packId, orderId);
 
 }
-  const detailClick = (event) => {
-    console.log(event)
-    emit("transportPackageDetail", event.data.id , props.order.id);
-  }
 
-const cancel = () => {
-  emit('cancel', editingOrder.value)
-}
+
+
 
 const alterStatus = async () => {
 
@@ -201,6 +194,7 @@ const alterStatus = async () => {
             <label for="number-input">Logistic Operator</label>
             <field-error-message :errors="errors" fieldName="logistic_operator_name"></field-error-message>
           </span>
+        </div>
         <div class="flex">
             <div class="p-float-label">
               <InputText
@@ -248,7 +242,7 @@ const alterStatus = async () => {
               <field-error-message :errors="errors" fieldName="logistic_operator_name"></field-error-message>
             </span>
           </div>
-        </div>
+        </div> <!--AAAAAAAA-->  
         <!-- List of products -->
         <div class="mb-5" v-if="order.products && order.products.length > 0">
           <label for="number-input">Products</label>
@@ -274,6 +268,7 @@ const alterStatus = async () => {
             <Column sortable field="type" header="Package Type"></Column>
             <Column sortable field="volume" header="Max Volume"></Column>
           </DataTable>
+        </div>
         <!-- List of transport packages -->
         <div class="mb-5">
           <span class="p-float-label" v-if="order.transportPackages && order.transportPackages.length > 0">
@@ -298,6 +293,7 @@ const alterStatus = async () => {
             </Column>
           </DataTable>
           <Chart v-else type="line" :data="chartData(observations)" />
+        </div>
         <!-- Table with all transport packages not associated-->
         <h2>Transport Packages Not Associated</h2>
         <div class="mb-5" >

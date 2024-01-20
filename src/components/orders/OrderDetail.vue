@@ -1,6 +1,7 @@
 <script setup>
-  import { ref, watch, computed } from 'vue'
+  import { ref, watch, computed,onMounted } from 'vue'
   import Dropdown from 'primevue/dropdown';
+  import axios from 'axios'
   import InputText from 'primevue/inputtext';
   import Listbox from 'primevue/listbox';
 
@@ -9,16 +10,27 @@
       type: Object,
       required: true
     },
+    observations: {
+      type: Array,
+      default: () => [],
+    },
     errors: {
       type: Object,
       default: null
     }
+
   })
 
   const emit = defineEmits(['save', 'cancel', 'transportPackageDetail'])
 
 
+  
+  const observations = ref(props.observations)
+  console.log("obs --> " , props.observations)
 
+
+
+  const uniqueSensorNames = computed(() => [...new Set(props.observations.map(item => item.sensorName))]);
 
   const orderTitle = computed(() => {
     return  'Order ' + props.order.id
@@ -33,6 +45,9 @@
   const cancel = () => {
     emit('cancel', editingOrder.value)
   }
+
+  //onMounted LoadObservations
+
 </script>
 
 <template>
@@ -116,12 +131,28 @@
               readonly
               @click="detailClick(transportPackage.id)"
             />
-            <label for="number-input">Transport Packages</label>
+            <label for="number-input">Transport Packages(click for more details)</label>
             <field-error-message :errors="errors" fieldName="transportPackages"></field-error-message>
           </span>
           <div v-else>
             <p>No transport packages available.</p><br>
           </div>
+        </div>
+
+        <div class="mb-5" v-for="sensor in uniqueSensorNames" >
+          <h2>{{sensor}}</h2>
+          <table>
+            <tr>
+              <th>Value</th>
+              <th>Time</th>
+            </tr>
+            <tr v-for="obs in props.observations" :key="obs.id" >
+              <template v-if="obs.sensorName == sensor">
+                <td>{{ obs.value }}</td>
+                <td>{{ obs.date }}</td>
+              </template>
+            </tr>
+          </table>
         </div>
        
       </div>
@@ -143,5 +174,22 @@
 }
 .checkCompleted {
   min-height: 2.375rem;
+}
+
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td,
+th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
 }
 </style>

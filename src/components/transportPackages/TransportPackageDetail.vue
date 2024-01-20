@@ -28,6 +28,11 @@ const props = defineProps({
     type: Object,
     required: false,
   },
+  orderId: {
+    type: Number,
+    default: null,
+    required: false,
+  }
 });
 
 
@@ -95,7 +100,7 @@ const cancel = () => {
         </div>
 
 
-      
+        <h1>Observations from order {{ orderId }}</h1>
         <div class="mb-5" v-for="sensor in editingTransportPackage.sensors">
           <h2>{{ sensor.name }}</h2>
           <table>
@@ -104,8 +109,10 @@ const cancel = () => {
               <th>Time</th>
             </tr>
             <tr v-for="obs in sensor.observations">
-              <td>{{ obs.value }}</td>
-              <td>{{ obs.date }}</td>
+              <template v-if = "obs.orderId == orderId">
+                <td>{{ obs.value }}</td>
+                <td>{{ obs.date }}</td>
+              </template>
             </tr>
           </table>
         </div>

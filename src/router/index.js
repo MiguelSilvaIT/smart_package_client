@@ -70,10 +70,11 @@ const router = createRouter({
       component: TransportPackages
     },
     {
-      path: '/transport_packages/:id',
+      path: '/transport_packages/:id/order/:orderId',
       name: 'TransportPackage',
       component: TransportPackage,
-      props: route => ({ id: parseInt(route.params.id) })
+      props: route => ({ id: parseInt(route.params.id) ,  orderId: parseInt(route.params.orderId) }),
+       
     },
     {
       path: '/transport_packages',

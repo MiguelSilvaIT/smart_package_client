@@ -78,7 +78,7 @@ const chartData = (observations) => {
 </script>
 
 <template>
-  <DataTable v-model:expandedRows="selectedSensor" @rowSelect="onRowExpand" @rowUnselect="onRowCollapse"
+  <DataTable v-model:filters="filters" v-model:expandedRows="selectedSensor" @rowSelect="onRowExpand" @rowUnselect="onRowCollapse"
      v-model:selection="selectedSensor" :value="sensors"
      selectionMode="multiple" dataKey="id" 
      :metaKeySelection=false paginator sortField="id" :sortOrder="1" :rows="30" >
@@ -101,7 +101,7 @@ const chartData = (observations) => {
               <p>
                 <strong> Sensor Name:</strong> {{ slotProps.data.name }}
               </p>
-              <div v-if="slotProps.data.name === 'GPS'">
+              <div v-if="slotProps.data.sensorType === 'LOCATION'">
                 <DataTable :value="slotProps.data.observations" paginator :rows="5" tableStyle="min-width: 50rem" stripedRows >
                   <Column field="value" header="Value"></Column>
                   <Column field="date" header="Date" >

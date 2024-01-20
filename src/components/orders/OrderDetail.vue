@@ -10,6 +10,9 @@ const router = useRouter()
 
 
 
+import { roundToNearestMinutes } from 'date-fns';
+import {useRouter} from 'vue-router';
+import {useUserStore} from '../../stores/user'
 
 const props = defineProps({
   order: {
@@ -62,6 +65,23 @@ const statusOptions = computed(() => {
 
 
 const uniqueSensorNames = computed(() => [...new Set(props.observations.map(item => item.sensorName))]);
+  const emit = defineEmits(['save', 'transportPackageDetail'])
+  const router = useRouter()
+  const userStore = useUserStore()
+
+  const selectedTransportPackage = ref();
+
+  const observationBySensor = computed(() => {
+    const result = {};
+    props.observations.forEach(item => {
+      if (!result[item.sensorType]) {
+        result[item.sensorType] = [];
+      }
+      result[item.sensorType].push(item);
+    });
+    console.log(result)
+    return result;
+  });
 
 const orderTitle = computed(() => {
   return 'Order ' + props.order.id
@@ -72,6 +92,10 @@ const detailClick = (packId, orderId) => {
   emit("transportPackageDetail", packId, orderId);
 
 }
+  const detailClick = (event) => {
+    console.log(event)
+    emit("transportPackageDetail", event.data.id , props.order.id);
+  }
 
 const cancel = () => {
   emit('cancel', editingOrder.value)
@@ -92,6 +116,41 @@ const alterStatus = async () => {
 }
 
 //ao alterar a seleção do dropdown, fazer um post request
+
+  const cancel = () => {
+    router.push({ name: 'orders' })
+  }
+
+  const formatDate = (timestamp) => {
+  console.log(props.observations)
+    const date = new Date(timestamp);
+    const options = { hour: 'numeric',
+        minute: 'numeric',  month: 'short', day: 'numeric',year: 'numeric' };
+    return new Intl.DateTimeFormat('pt-PT', options).format(date);
+  }
+
+  const areValuesFloat =(observations) =>{
+      // Check if values can be converted to float
+    const floatValues = observations.every(observation => !isNaN(parseFloat(observation.value)) &&  !observation.value.includes(','));
+
+    console.log(floatValues)
+    return floatValues
+  }
+
+  const chartData = (observations) => {
+  return {
+    labels: observations.map(obs => formatDate(obs.date)),
+    datasets: [
+      {
+        label: 'Sensor Value',
+        data: observations.map(obs => obs.value),
+        fill: false,
+        borderColor: 'rgb(75, 192, 192)',
+        tension: 0.1
+      }
+    ]
+  }
+}
 
 
 </script>
@@ -142,6 +201,53 @@ const alterStatus = async () => {
             <label for="number-input">Logistic Operator</label>
             <field-error-message :errors="errors" fieldName="logistic_operator_name"></field-error-message>
           </span>
+        <div class="flex">
+            <div class="p-float-label">
+              <InputText
+                type="text"
+                v-model="order.clientUsername"
+                :class="{ 'p-invalid': errors ? errors['clientUsername'] : false }"
+                readonly
+              />
+              <label for="dd-paymentType">Client Username</label>
+              <field-error-message :errors="errors" fieldName="name"></field-error-message>
+            </div>
+          <div class="mb-5">
+            <span class="p-float-label">
+              <InputText
+                type="text"
+                v-model="order.creation_date"
+                :class="{ 'p-invalid': errors ? errors['creation_date'] : false }"
+                readonly
+              />
+              <label for="number-input">Creation Date</label>
+              <field-error-message :errors="errors" fieldName="creation_date"></field-error-message>
+            </span>
+          </div>
+          <div class="mb-5">
+            <span class="p-float-label">
+              <InputText
+                type="text"
+                v-model="order.status"
+                :class="{ 'p-invalid': errors ? errors['status'] : false }"
+                readonly
+              />
+              <label for="number-input">Status</label>
+              <field-error-message :errors="errors" fieldName="status"></field-error-message>
+            </span>
+          </div>
+          <div class="mb-5">
+            <span class="p-float-label">
+              <InputText
+                type="text"
+                v-model="order.logisticsOperatorUsername"
+                :class="{ 'p-invalid': errors ? errors['logistic_operator_name'] : false }"
+                readonly
+              />
+              <label for="number-input">Logistic Operator</label>
+              <field-error-message :errors="errors" fieldName="logistic_operator_name"></field-error-message>
+            </span>
+          </div>
         </div>
         <!-- List of products -->
         <div class="mb-5" v-if="order.products && order.products.length > 0">
@@ -155,6 +261,19 @@ const alterStatus = async () => {
         <div v-else>
           <p>No products available.</p><br>
         </div>
+        
+        <div v-if="userStore.userType == 'LogisticsOperator'"> 
+          <h4 class="ms-3"> Transport Packages</h4>
+          <DataTable v-model:expandedRows="selectedTransportPackage" @rowSelect="detailClick"
+              v-model:selection="selectedTransportPackage" :value="order.transportPackages"
+              selectionMode="single" dataKey="id" v-if="userStore.userType == 'LogisticsOperator'"
+              :metaKeySelection=false paginator sortField="id" :sortOrder="1" :rows="5" stripedRows>
+            <template #empty> No transport packages found. </template>
+            <Column sortable field="id" header="Id"></Column>
+            <Column sortable field="material" header="Material"></Column>
+            <Column sortable field="type" header="Package Type"></Column>
+            <Column sortable field="volume" header="Max Volume"></Column>
+          </DataTable>
         <!-- List of transport packages -->
         <div class="mb-5">
           <span class="p-float-label" v-if="order.transportPackages && order.transportPackages.length > 0">
@@ -169,6 +288,16 @@ const alterStatus = async () => {
           </div>
         </div>
 
+        <div class="mt-4" v-for="(observations, sensorType) in observationBySensor" :key="sensorType">
+          <h5 class="ms-5">{{ sensorType }} Sensor</h5>
+          <DataTable :value="observations" v-if="!areValuesFloat(observations)" :paginator="true" :rows="5"  :paginatorTemplate="paginatorTemplate" stripedRows>
+            <Column v-if="userStore.userType == 'LogisticsOperator'" field="sensorId" header="Sensor Id" :sortable="true" ></Column>
+            <Column field="value" header="Value" :sortable="true"></Column>
+            <Column field="date" header="Date" :sortable="true">                
+              <template #body="slotProps">{{ formatDate(slotProps.data.date) }}</template>
+            </Column>
+          </DataTable>
+          <Chart v-else type="line" :data="chartData(observations)" />
         <!-- Table with all transport packages not associated-->
         <h2>Transport Packages Not Associated</h2>
         <div class="mb-5" >

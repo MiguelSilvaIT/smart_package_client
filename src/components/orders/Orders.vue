@@ -68,16 +68,6 @@ const router = useRouter()
   </div>
   <hr>
 
-  <div class="mx-2 mt-2">
-    <button
-      type="button"
-      class="btn btn-success px-4 btn-addorder"
-      @click="addOrder"
-    >
-      <i class="bi bi-xs bi-plus-circle"></i>&nbsp; Add Order
-    </button>
-  </div>
-
   <order-table
     :orders="orders"
     :showId="true"

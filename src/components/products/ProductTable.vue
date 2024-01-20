@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted,watch } from "vue";
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import { FilterMatchMode } from 'primevue/api';
@@ -43,33 +43,59 @@ const props = defineProps({
 
 const toast = useToast();
 const selectedProduct = ref();
-const catalogProducts = ref([])
+const catalogProducts = ref([]);
+const primaryPackage = ref([]);
+const secondaryPackage = ref([]);
+const terciaryPackage = ref([]);
+
+watch(props.products, (val) => {
+  console.log(terciaryPackage.value)
+});
 
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
 
-const onRowExpand = (event) => {
+const onRowExpand = async (event) => {
+  console.log(event)
   loadProductsCatalog(event.data.catalogProductId);
-  toast.add({ severity: 'info', summary: 'Order Expanded', detail: event.data.name, life: 3000 });
+  loadProduct(event.data.id,event.index);
+  
 };
 
 const onRowCollapse = (event) => {
-  toast.add({ severity: 'info', summary: 'Order Collapsed', detail: event.data.name, life: 3000 });
 };
 
-console.log(props.products)
+const loadProduct = async (id,index) => {
+  const response = await axios.get('products/' + id)
+  console.log("Product",response.data)
+  primaryPackage.value[index] = response.data.productPackages[0]
+  secondaryPackage.value[index] = response.data.productPackages[1] 
+  terciaryPackage.value[index] = response.data.productPackages[2]
+}
 
 const loadProductsCatalog = async (id) => {
   const response = await axios.get('catalog_products/' + id)
   catalogProducts.value = response.data
-  console.log(response.data)
+  
+  console.log("Catalog",response.data)
+}
+
+const getPackage = (product,packType) => {
+  // console.log(product)
+  for (let i = 0; i < product.productPackages.length; i++) {
+    if (product.productPackages[i].type == packType) {
+
+      return product.productPackages[i];
+    }
+  }
+  return null;
 }
 
 </script>
 
 <template>
-  <DataTable v-model:expandedRows="selectedProduct" @rowSelect="onRowExpand" @rowUnselect="onRowCollapse"
+  <DataTable v-model:filters="filters" v-model:expandedRows="selectedProduct" @rowSelect="onRowExpand" @rowUnselect="onRowCollapse"
      v-model:selection="selectedProduct" :value="products"
      selectionMode="multiple" dataKey="id" 
      :metaKeySelection=false paginator sortField="id" :sortOrder="1" :rows="30" >
@@ -92,29 +118,65 @@ const loadProductsCatalog = async (id) => {
       </Column>      
       <template #expansion="slotProps" >
           <div class="expandedDiv">
-            <h5 class="ms-3">Product # {{ slotProps.data.id }}</h5>
+            <div class ="flex justify-content-between">
+              <div class="ms-1 mt-3">
+                <h5 class="ms-3">Product # {{ slotProps.data.id }}</h5>
+              </div>
+              <div class="ms-5 mt-3">
+                <h5 > Primary Package</h5>
+              </div>
+              <div class="ms-4 mt-3 ">
+                <h5> Secondary Package</h5>
+              </div>
+              <div class="mt-3 me-5">
+                <h5> Tertiary Package</h5>
+              </div>
+            </div>
             <div class="contentContainer">
               <div class="ms-1 mt-3">
                 <p >
-                  <strong> Product Catalog Id:</strong> {{ slotProps.data.catalogProductId }}
+                  <strong> Catalog Product Id:</strong> {{ slotProps.data.catalogProductId }}
                 </p>
                 <p >
-                  <strong> Product:</strong> {{ catalogProducts.name }}
+                  <strong> Name:</strong> {{ catalogProducts.name }}
                 </p>
                 <p >
-                  <strong> Product Description:</strong> {{ catalogProducts.description }}
+                  <strong> Description:</strong> {{ catalogProducts.description }}
                 </p>
                 
               </div>
               <div class=" ms-1 mt-3">
-                <p>
-                  <strong> Order Id:</strong> 
-                    <span v-if="slotProps.data.orderId === -1"> None</span>
-                    <span v-else>{{ slotProps.data.orderId }}</span>
+                <p >
+                  <strong> Package Id:</strong> {{ primaryPackage[slotProps.index] != null ? primaryPackage[slotProps.index].id : "None" }}
                 </p>
                 <p >
-                  <strong> Manufacturer Username:</strong> {{ slotProps.data.manufacturerUsername }}
+                  <strong> Package Material:</strong> {{ primaryPackage[slotProps.index] != null ? primaryPackage[slotProps.index].material : "None" }}
                 </p>
+                <p >
+                  <strong> Package Volume:</strong> {{ primaryPackage[slotProps.index] != null ? primaryPackage[slotProps.index].volume : "None" }}
+                </p>
+              </div>
+              <div class=" ms-1 mt-3">
+                <p >
+                  <strong> Package Id:</strong> {{ secondaryPackage[slotProps.index] != null ? secondaryPackage[slotProps.index].id : "None" }}
+                </p>
+                <p>
+                  <strong> Package Material:</strong> {{ secondaryPackage[slotProps.index] != null ? secondaryPackage[slotProps.index].material : "None" }}
+                </p>
+                <p >
+                  <strong> Package Volume:</strong> {{ secondaryPackage[slotProps.index] != null ? secondaryPackage[slotProps.index].volume : "None" }}
+                </p>
+              </div>
+              <div class=" ms-1 mt-3 me-4">
+                <p >
+                  <strong> Package Id:</strong> {{ terciaryPackage[slotProps.index] != null ? terciaryPackage[slotProps.index].id : "None"}}
+                </p>
+                <p >
+                  <strong> Package Material:</strong> {{ terciaryPackage[slotProps.index] != null ? terciaryPackage[slotProps.index].material : "None" }}
+                </p>
+                <p >
+                  <strong> Package Volume:</strong> {{ terciaryPackage[slotProps.index] != null ? terciaryPackage[slotProps.index].volume : "None"}}
+                 </p> 
               </div>
             </div>
           </div>

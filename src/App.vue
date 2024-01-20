@@ -32,13 +32,13 @@ const logout = async () => {
 
       <div class="collapse navbar-collapse justify-content-end">
         <ul class="navbar-nav">
-          <router-link to="/auth/register" class="nav-link">
+          <router-link to="/auth/register" class="nav-link" v-show="!userStore.user">
           <li class="nav-item">
               <i class="bi bi-person-check-fill"></i>
               Register
           </li>
           </router-link>
-          <router-link to="/auth/login" class="nav-link">
+          <router-link to="/auth/login" class="nav-link" v-show="!userStore.user">
           <li class="nav-item">
               <i class="bi bi-box-arrow-in-right"></i>
               Login

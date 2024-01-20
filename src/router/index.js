@@ -44,7 +44,7 @@ const router = createRouter({
       props: route => ({ id: parseInt(route.params.id) })
     },
     {
-      path:'/catalog_products',
+      path:'/catalogProducts',
       name: 'catalogProducts',
       component: CatalogProducts,
     },

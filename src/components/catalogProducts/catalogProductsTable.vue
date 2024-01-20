@@ -30,15 +30,40 @@ const props = defineProps({
 });
 
 const toast = useToast();
-const emit = defineEmits(["edit"]);
+const emit = defineEmits(["edit","addPackage"]);
 const selectedProduct = ref();
 const editingProductDescription = ref();
 const editingProductName = ref();
 const editingProduct = ref();
 const showDialog = ref(false);
 const showPackageDialog = ref(false);
-const availableProductPackages = ref([])
-const productPackage = ref()
+// const availableProductPackages = ref([])
+  const productPackage = ref()
+  const packageMaterial = ref(null);
+  const secPackageMaterial = ref(null);
+  const tercPackageMaterial = ref(null);
+  const volume = ref(0);
+  const secVolume = ref(0);
+  const tercVolume = ref(0);
+
+const materials = ref([
+  { name: 'Cardboard', value: 'cardboard' },
+  { name: 'Plastic', value: 'plastic' },
+  { name: 'Wood', value: 'wood' },
+  { name: 'Metal', value: 'metal' },
+  { name: 'Glass', value: 'glass' },
+  { name: 'Paper', value: 'paper' },
+  { name: 'Ceramic', value: 'ceramic' },
+  { name: 'Textile', value: 'textile' },
+  { name: 'Leather', value: 'leather' },
+  { name: 'Rubber', value: 'rubber' },
+  { name: 'Foil', value: 'foil' },
+  { name: 'Wax', value: 'wax' },
+  { name: 'Resin', value: 'resin' },
+  { name: 'Bamboo', value: 'bamboo' },
+  { name: 'Cork', value: 'cork' },
+  // Add more materials as needed
+]);
 
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -68,33 +93,43 @@ const hideDialog = () => {
 };
 
 const showAddPackage = (prodPackage,visible) => {
-  productPackage.value = productPackage
+  productPackage.value = prodPackage
+  packageMaterial.value = productPackage.value.catalogPackage.material;
+  volume.value = productPackage.value.catalogPackage.volume;
+  secPackageMaterial.value = productPackage.value.catalogPackage.secPackageMaterial;
+  secVolume.value = productPackage.value.catalogPackage.secPackageVolume;
+  tercPackageMaterial.value = productPackage.value.catalogPackage.terciaryPackageMaterial;
+  tercVolume.value = productPackage.value.catalogPackage.terciaryPackageVolume;
+  
   showPackageDialog.value = visible
 };
 
-const addPackage = () => {
-  editingProduct.value.productPackages.push(productPackage.value)
-  emit("edit", editingProduct.value);
-  hidePackageDialog()
-};
+const addPackage = async() => {
+  
+    emit("addPackage", productPackage.value, packageMaterial.value, volume.value, 
+                    secPackageMaterial.value, secVolume.value, tercPackageMaterial.value, tercVolume.value);
+    hidePackageDialog()
+}
 
 const hidePackageDialog = () => {
   showPackageDialog.value = false
 };
 
-const loadProductPackages = async () => {
-  const response = await axios.get('product_packages')
-  availableProductPackages.value = response.data
-  console.log(availableProductPackages.value)
-}
+// const loadProductPackages = async () => {
+//   const response = await axios.get('product_packages')
+//   availableProductPackages.value = response.data
+//   console.log(availableProductPackages.value)
+// }
 
 const customLabel = (slotProps) => {
   return slotProps.id + ' : ' + slotProps.type + ' - ' + slotProps.material
 }
 
-onMounted(() => {
-  loadProductPackages()
-    })
+// onMounted(() => {
+//   loadProductPackages()
+// })
+
+
 </script>
 
 <template>
@@ -148,17 +183,68 @@ onMounted(() => {
         <Button label="Cancel" class="p-button-secondary m-3" @click="hideDialog" />
       </div>
     </Dialog>
-    <Dialog header="Change Catalog Product" v-model:visible="showPackageDialog" :modal="true" :closable="false">
-      <div class="mb-5 mt-4">
-        <span class="p-float-label">
-          <Dropdown v-model="productPackage" :options="availableProductPackages" optionValue="id">
-            <template #option="slotProps">
-              {{ customLabel(slotProps.option) }}
-            </template>
-          </Dropdown>
-        <label>Package</label>
-        </span>
-      </div>
+    <Dialog header="Change package details" v-model:visible="showPackageDialog" :modal="true" :closable="false">
+          <!-- package material && pacakge volume                           -->
+          <!-- sempre q um produto fosse criado, criava se um package primario, 
+          com os detalhes do packageDetails do catalogProduct associado     -->
+          <div style="margin-bottom: 2rem; margin-left: 3rem;">
+            <h6 > Primary Package</h6>
+        </div>
+        <div class="g-3 mb-4 d-flex flex-start " style="margin-left: 1rem;">
+            <div class = "mb-5" style="width: 40%;">
+                <span class="p-float-label">
+                <Dropdown v-model="packageMaterial" :options="materials" optionLabel="name" optionValue="name"/>
+                
+                <label> Package Material</label>
+                </span>
+            </div>
+            
+            <div class = "mb-5 ml-6" style=" width: 30%;">
+                <span class="p-float-label">
+                <InputNumber v-model="volume" :min="0" />
+                            <label>Package Volume</label>
+                </span>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 2rem; margin-left: 3rem;">
+            <h6 > Secondary Package</h6>
+        </div>
+        <div class="g-3 mb-4 d-flex flex-start " style="margin-left: 1rem;">
+            <div class = "mb-5" style="width: 40%;">
+                <span class="p-float-label">
+                <Dropdown v-model="secPackageMaterial" :options="materials" optionLabel="name" optionValue="name"/>
+                
+                <label> Package Material</label>
+                </span>
+            </div>
+            
+            <div class = "mb-5 ml-6" style=" width: 30%;">
+                <span class="p-float-label">
+                <InputNumber v-model="secVolume" :min="volume" />
+                    <label>Package Volume</label>
+                </span>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 2rem; margin-left: 3rem;">
+            <h6 > Terciary Package </h6>
+        </div>
+        <div class="g-3 mb-4 d-flex flex-start " style="margin-left: 1rem;">
+            <div class = "mb-5" style="width: 40%;">
+                <span class="p-float-label">
+                <Dropdown v-model="tercPackageMaterial" :options="materials" optionLabel="name" optionValue="name"/>
+                <label> Package Material</label>
+                </span>
+            </div>
+            
+            <div class = "mb-5 ml-6" style=" width: 30%;">
+                <span class="p-float-label">
+                <InputNumber v-model="tercVolume" :min="secVolume" />
+                            <label>Package Volume</label>
+                </span>
+            </div>
+        </div>
       <div class="p-d-flex p-jc-end p-mt-3 mt-4">
         <Button label="Confirm" class="m-3" @click="addPackage" />
         <Button label="Cancel" class="p-button-secondary m-3" @click="hidePackageDialog" />

@@ -4,10 +4,10 @@ import { useToast } from "vue-toastification"
 import { ref, watch , computed} from 'vue'
 import ProductDetail from "./ProductDetail.vue"
 import { useRouter, onBeforeRouteLeave } from 'vue-router'
-//import {useUserStore} from '@/store/userStore'
+import { useUserStore } from '../../stores/user'
 
-//const userStore = useUserStore()
-const toast = useToast()
+const userStore = useUserStore()
+const toast = useToast() 
 const router = useRouter()
 
 const props = defineProps({
@@ -54,11 +54,11 @@ const loadProduct = async (id) => {
 const operation = computed( () => (!props.id || props.id < 0) ? 'insert' : 'update')
 
 
-const save =  (catalogProduct, manufacturerUsername, quantity) => {
+const save =  (catalogProduct, quantity) => {
   if (operation.value == 'insert') {
-    axios.post('products', {"catalogProductId": catalogProduct , "manufacturerUsername": manufacturerUsername, "quantity": quantity})
+    axios.post('products', {"catalogProductId": catalogProduct , "manufacturerUsername": userStore.userUsername, "quantity": quantity})
       .then((response) => {
-        toast.success('Product Created')
+        toast.success(response.data)
         console.dir(response.data.data)
         originalValueStr = JSON.stringify(product.value)
         router.push({name:'Products'})

@@ -49,7 +49,7 @@ const productTitle = computed( () => {
   })
 
 const save = () => {
-  emit("save", catalogProductId.value, productManufacturer.value, quantity.value);
+  emit("save", catalogProductId.value, quantity.value);
 }
 
 const cancel = () => {

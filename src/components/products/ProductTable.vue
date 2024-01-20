@@ -41,7 +41,7 @@ const props = defineProps({
 
 const toast = useToast();
 const emit = defineEmits(["edit"]);
-const selectedProduct = ref();
+const selectedProduct = ref([]);
 
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -58,6 +58,11 @@ const onRowCollapse = (event) => {
 const editClick = (product) => {
   emit("edit", product);
 };
+
+// const showPackages = (product) => {
+  
+// };
+
 </script>
 
 <template>
@@ -91,6 +96,14 @@ const editClick = (product) => {
               >
                 <i class="bi bi-xs bi-pencil"></i>
               </button>
+
+              <!-- <button
+                class="btn btn-xs btn-light"
+                @click="showPackages(slotProps.data)"
+                v-if="showEditButton"
+              >
+                <i class="pi pi-box"></i>
+              </button> -->
           </template>
       </Column>
       <template #expansion="slotProps" >
